@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import API from "../api";
+import "./TestTaker.css";
 
 const TestTaker = () => {
   const { id } = useParams();
@@ -51,7 +52,7 @@ const TestTaker = () => {
 
   if (!accepted) {
     return (
-      <div>
+      <div className="TestTaker">
         <h1>Test Information</h1>
         <form
           onSubmit={(e) => {
@@ -93,11 +94,11 @@ const TestTaker = () => {
     );
   }
 
-  if (loading) return <div>Loading test...</div>;
+  if (loading) return <div className="TestTaker loading">Loading test...</div>;
 
   if (showResults) {
     return (
-      <div>
+      <div className="TestTaker results-display">
         <h1>Test Completed!</h1>
         <p>
           Your score: {score}/{test.questions.length}
@@ -107,11 +108,11 @@ const TestTaker = () => {
   }
 
   return (
-    <div>
+    <div className="TestTaker">
       <h1>{test?.title}</h1>
       <form onSubmit={handleSubmit}>
         {test?.questions.map((q, index) => (
-          <div key={q._id}>
+          <div key={q._id} className="question-container">
             <h3>
               {index + 1}. {q.question}
             </h3>

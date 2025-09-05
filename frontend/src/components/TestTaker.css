@@ -1,0 +1,110 @@
+/* TestTaker.css */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+.TestTaker {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.TestTaker h1 {
+  text-align: center;
+  color: #1a237e;
+  margin-bottom: 25px;
+}
+
+.TestTaker form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.TestTaker .info-form input[type="text"],
+.TestTaker .info-form input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.TestTaker .info-form label {
+  font-weight: 600;
+  color: #424242;
+}
+
+.TestTaker .question-container {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.TestTaker h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.TestTaker label {
+  display: block;
+  margin-bottom: 10px;
+  cursor: pointer;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  transition: background-color 0.2s;
+}
+
+.TestTaker label:hover {
+  background-color: #f0f0f0;
+}
+
+.TestTaker input[type="radio"] {
+  margin-right: 10px;
+}
+
+.TestTaker button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 15px 25px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  align-self: flex-end;
+}
+
+.TestTaker button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.TestTaker .results-display {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.TestTaker .results-display p {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #28a745;
+}
+
+.TestTaker .loading {
+  text-align: center;
+  font-style: italic;
+  color: #6c757d;
+}

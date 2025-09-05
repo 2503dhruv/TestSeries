@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../api";
+import "./TeacherDashboard.css";
 
 const TeacherDashboard = () => {
   const [file, setFile] = useState(null);
@@ -48,7 +49,7 @@ const TeacherDashboard = () => {
   };
 
   return (
-    <div>
+    <div className="TeacherDashboard">
       <h1>Teacher Dashboard</h1>
 
       <h2>Upload New Test</h2>
