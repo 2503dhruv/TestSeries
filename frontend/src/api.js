@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5100/api",
+  baseURL: "https://testseries-1vg0.onrender.com/api",
 });
 
 // Add interceptors here later if you add authentication tokens
