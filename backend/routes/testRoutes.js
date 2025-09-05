@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { readFile, utils } from 'xlsx';
-import Test, { find, findById } from '../models/Test';
-import Result, { find as _find } from '../models/Result';
+import pkg from 'xlsx';
+const { readFile, utils } = pkg;
+import Test from '../models/Test.js';
+import Result from '../models/Result.js';
 
 const router = Router();
 const upload = multer({ dest: 'uploads/' });
@@ -36,7 +37,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 // Student: Fetch all tests
 router.get('/tests', async (req, res) => {
     try {
-        const tests = await find({}, 'title');
+        const tests = await Test.find({}, 'title');
         res.json(tests);
     } catch (err) {
         res.status(500).send('Server error');
@@ -46,7 +47,7 @@ router.get('/tests', async (req, res) => {
 // Student: Fetch test by ID
 router.get('/tests/:id', async (req, res) => {
     try {
-        const test = await findById(req.params.id, 'title questions');
+        const test = await Test.findById(req.params.id, 'title questions');
         if (!test) return res.status(404).send('Test not found.');
         res.json(test);
     } catch (err) {
@@ -58,7 +59,7 @@ router.get('/tests/:id', async (req, res) => {
 router.post('/submit/:id', async (req, res) => {
     try {
         const { studentName, studentEmail, answers } = req.body;
-        const test = await findById(req.params.id);
+        const test = await Test.findById(req.params.id);
         if (!test) return res.status(404).send('Test not found.');
 
         let score = 0;
@@ -89,7 +90,7 @@ router.post('/submit/:id', async (req, res) => {
 // Teacher: Get results
 router.get('/results', async (req, res) => {
     try {
-        const results = await _find().populate('testId', 'title');
+        const results = await Result.find().populate('testId', 'title');
         res.json(results);
     } catch (err) {
         res.status(500).send('Server error');

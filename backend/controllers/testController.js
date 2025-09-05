@@ -1,4 +1,4 @@
-import Test from "../models/Test";
+import Test from "../models/Test.js";
 
 // Get all tests
 const getTests = async (req, res) => {

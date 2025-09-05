@@ -1,8 +1,9 @@
 import express, { json, urlencoded } from 'express';
 import { connect } from 'mongoose';
 import cors from 'cors';
-import testRoutes from './routes/testRoutes';
-require('dotenv').config();
+import testRoutes from './routes/testRoutes.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5100;

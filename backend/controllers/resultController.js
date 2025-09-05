@@ -1,5 +1,5 @@
-import Result from "../models/Result";
-import Test from "../models/Test";
+import Result from "../models/Result.js";
+import Test from "../models/Test.js";
 
 // Get all results
 const getResults = async (req, res) => {
