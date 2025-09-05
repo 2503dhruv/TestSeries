@@ -19,6 +19,5 @@
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "xlsx": "^0.18.5"
-  },
-  "devDependencies": {}
+  }
 }
