@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const resultSchema = new mongoose.Schema({
+const resultSchema = new Schema({
     studentName: String,
     studentEmail: String,
     testId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Test'
     },
     score: Number,
@@ -12,4 +12,4 @@ const resultSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Result', resultSchema);
+export default model('Result', resultSchema);

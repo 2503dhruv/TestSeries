@@ -1,10 +1,10 @@
-const express = require('express');
-const multer = require('multer');
-const xlsx = require('xlsx');
-const Test = require('../models/Test');
-const Result = require('../models/Result');
+import { Router } from 'express';
+import multer from 'multer';
+import { readFile, utils } from 'xlsx';
+import Test, { find, findById } from '../models/Test';
+import Result, { find as _find } from '../models/Result';
 
-const router = express.Router();
+const router = Router();
 const upload = multer({ dest: 'uploads/' });
 
 // Teacher: Upload test
@@ -12,9 +12,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).send('No file uploaded.');
 
-        const workbook = xlsx.readFile(req.file.path);
+        const workbook = readFile(req.file.path);
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const data = xlsx.utils.sheet_to_json(sheet);
+        const data = utils.sheet_to_json(sheet);
 
         const testTitle = req.body.title || 'Untitled Test';
         const questions = data.map(row => ({
@@ -36,7 +36,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 // Student: Fetch all tests
 router.get('/tests', async (req, res) => {
     try {
-        const tests = await Test.find({}, 'title');
+        const tests = await find({}, 'title');
         res.json(tests);
     } catch (err) {
         res.status(500).send('Server error');
@@ -46,7 +46,7 @@ router.get('/tests', async (req, res) => {
 // Student: Fetch test by ID
 router.get('/tests/:id', async (req, res) => {
     try {
-        const test = await Test.findById(req.params.id, 'title questions');
+        const test = await findById(req.params.id, 'title questions');
         if (!test) return res.status(404).send('Test not found.');
         res.json(test);
     } catch (err) {
@@ -58,7 +58,7 @@ router.get('/tests/:id', async (req, res) => {
 router.post('/submit/:id', async (req, res) => {
     try {
         const { studentName, studentEmail, answers } = req.body;
-        const test = await Test.findById(req.params.id);
+        const test = await findById(req.params.id);
         if (!test) return res.status(404).send('Test not found.');
 
         let score = 0;
@@ -89,11 +89,11 @@ router.post('/submit/:id', async (req, res) => {
 // Teacher: Get results
 router.get('/results', async (req, res) => {
     try {
-        const results = await Result.find().populate('testId', 'title');
+        const results = await _find().populate('testId', 'title');
         res.json(results);
     } catch (err) {
         res.status(500).send('Server error');
     }
 });
 
-module.exports = router;
+export default router;

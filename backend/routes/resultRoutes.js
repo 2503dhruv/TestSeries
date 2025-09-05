@@ -1,7 +1,7 @@
-const express = require("express");
-const { getResults, submitTest } = require("../controllers/resultController");
+import { Router } from "express";
+import { getResults, submitTest } from "../controllers/resultController";
 
-const router = express.Router();
+const router = Router();
 
 // Get all results
 router.get("/", getResults);
@@ -9,4 +9,4 @@ router.get("/", getResults);
 // Submit test answers
 router.post("/submit/:id", submitTest);
 
-module.exports = router;
+export default router;

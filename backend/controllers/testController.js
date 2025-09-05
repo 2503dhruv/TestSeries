@@ -1,4 +1,4 @@
-const Test = require("../models/Test");
+import Test from "../models/Test";
 
 // Get all tests
 const getTests = async (req, res) => {
@@ -33,4 +33,4 @@ const uploadTest = async (req, res) => {
   }
 };
 
-module.exports = { getTests, getTestById, uploadTest };
+export default { getTests, getTestById, uploadTest };

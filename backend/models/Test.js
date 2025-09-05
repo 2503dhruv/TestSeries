@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const questionSchema = new mongoose.Schema({
+const questionSchema = new Schema({
     question: String,
     options: [String],
     correctAnswer: String
 });
 
-const testSchema = new mongoose.Schema({
+const testSchema = new Schema({
     title: String,
     questions: [questionSchema]
 });
 
-module.exports = mongoose.model('Test', testSchema);    
+export default model('Test', testSchema);    

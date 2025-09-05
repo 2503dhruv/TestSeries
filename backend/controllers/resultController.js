@@ -1,5 +1,5 @@
-const Result = require("../models/Result");
-const Test = require("../models/Test");
+import Result from "../models/Result";
+import Test from "../models/Test";
 
 // Get all results
 const getResults = async (req, res) => {
@@ -40,4 +40,4 @@ const submitTest = async (req, res) => {
   }
 };
 
-module.exports = { getResults, submitTest };
+export default { getResults, submitTest };
