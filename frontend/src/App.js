@@ -1,27 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import StudentPortal from './components/StudentPortal';
-import TestTaker from './components/TestTaker';
-import TeacherDashboard from './components/TeacherDashboard';
-import Navbar from './components/Navbar/Navbar'; 
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Homepage from './pages/Homepage';
+import AuthPage from './pages/AuthPage';
+import StudentPortal from './pages/StudentPortal';
+import TeacherDashboard from './pages/TeacherDashboard';
 
 function App() {
-    return (
-        <Router>
-            
-            <Navbar />
-
-            <Routes>
-                <Route path="/" element={<StudentPortal />} />
-                <Route path="/Student" element={<StudentPortal />} />
-                <Route path="/test/:id" element={<TestTaker />} />
-                <Route path="/teacher" element={<TeacherDashboard />} />
-            </Routes>
-
-            <ToastContainer position="top-right" autoClose={3000} />
-        </Router>
-    );
+  return (
+    <Routes>
+      {/* Routes that use the main layout with the navbar */}
+      <Route element={<Layout />}>
+        <Route index element={<Homepage />} />
+        <Route path="student-portal" element={<StudentPortal />} />
+        <Route path="teacher-dashboard" element={<TeacherDashboard />} />
+      </Route>
+      
+      {/* Route for the combined login/signup page (it does not have the main navbar) */}
+      <Route path="auth" element={<AuthPage />} />
+    </Routes>
+  );
 }
 
 export default App;
+
