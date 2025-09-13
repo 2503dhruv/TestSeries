@@ -54,7 +54,6 @@ router.post(
 
 
 
-  // ---------------- Get All Tests ----------------
   router.get('/tests', async (req, res) => {
     try {
       const tests = await Test.find({}, 'title section difficulty');
@@ -147,5 +146,9 @@ router.post(
     }
   });
 
+
+  router.get('/ping', (req, res) => {
+  res.send('✅ testRoutes is alive');
+});
 
   export default router;
