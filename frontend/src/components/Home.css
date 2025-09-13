@@ -14,10 +14,9 @@
   justify-content: center;
   padding: 80px 20px;
   text-align: center;
-  /* You can replace this URL with your own background image */
   background: 
     linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.85)),
-    url("C:\Users\Dhruv\TestSeries\frontend\src\8machine-_-LhNDEs4MP5w-unsplash.jpg") no-repeat center center/cover;
+    url("/images/8machine-_-LhNDEs4MP5w-unsplash.jpg") no-repeat center center/cover;
   color: white;
 }
 

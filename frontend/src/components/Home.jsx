@@ -4,7 +4,6 @@ import { Card, CardContent } from "../components/ui/Card";
 import { Link } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
 
-// External CSS (only one file now)
 import "./Home.css";
 
 export default function Home() {
