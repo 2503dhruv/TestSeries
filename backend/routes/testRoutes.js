@@ -1,100 +1,151 @@
-import { Router } from 'express';
-import multer from 'multer';
-import pkg from 'xlsx';
-const { readFile, utils } = pkg;
-import Test from '../models/Test.js';
-import Result from '../models/Result.js';
+  import { Router } from 'express';
+  import multer from 'multer';
+  import { Types } from 'mongoose';
+  import pkg from 'xlsx';
+  import Test from '../models/Test.js';
+  import Result from '../models/Result.js';
+  import mongoose from "mongoose";
 
-const router = Router();
-const upload = multer({ dest: 'uploads/' });
+  const { ObjectId } = Types;
+  const { readFile, utils } = pkg;
+  const router = Router();
+  const upload = multer({ dest: 'uploads/' });
 
-// Teacher: Upload test
-router.post('/upload', upload.single('file'), async (req, res) => {
+router.post(
+  "/upload",
+  upload.fields([
+    { name: "file", maxCount: 1 },
+    { name: "title", maxCount: 1 },
+    { name: "section", maxCount: 1 },
+    { name: "difficulty", maxCount: 1 },
+  ]),
+  async (req, res) => {
     try {
-        if (!req.file) return res.status(400).send('No file uploaded.');
+      console.log("BODY:", req.body);
+      console.log("FILES:", req.files);
 
-        const workbook = readFile(req.file.path);
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const data = utils.sheet_to_json(sheet);
+      const filePath = req.files.file[0].path;
+      const workbook = readFile(filePath);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = utils.sheet_to_json(sheet);
 
-        const testTitle = req.body.title || 'Untitled Test';
-        const questions = data.map(row => ({
-            question: row.Question,
-            options: [row.OptionA, row.OptionB, row.OptionC, row.OptionD],
-            correctAnswer: row['Correct Answer']
-        }));
+      const questions = rows.map((row) => ({
+        question: row.Question,
+        options: [row.OptionA, row.OptionB, row.OptionC, row.OptionD],
+        correctAnswer: row.CorrectAnswer,
+      }));
 
-        const newTest = new Test({ title: testTitle, questions });
-        await newTest.save();
+      const test = new Test({
+        title: req.body.title,
+        section: req.body.section,
+        difficulty: req.body.difficulty,
+        questions,
+      });
 
-        res.status(201).send('Test uploaded successfully!');
+      await test.save();
+      res.json({ success: true, test });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+      console.error("Upload error:", err);
+      res.status(500).json({ error: "Failed to upload test" });
     }
-});
+  }
+);
+  
 
-// Student: Fetch all tests
-router.get('/tests', async (req, res) => {
+
+
+  // ---------------- Get All Tests ----------------
+  router.get('/tests', async (req, res) => {
     try {
-        const tests = await Test.find({}, 'title');
-        res.json(tests);
+      const tests = await Test.find({}, 'title section difficulty');
+      res.json(tests);
     } catch (err) {
-        res.status(500).send('Server error');
+      console.error(err);
+      res.status(500).send('Server error');
     }
-});
+  });
 
-// Student: Fetch test by ID
-router.get('/tests/:id', async (req, res) => {
+  // ---------------- Get Test by ID ----------------
+  router.get('/tests/:id', async (req, res) => {
     try {
-        const test = await Test.findById(req.params.id, 'title questions');
-        if (!test) return res.status(404).send('Test not found.');
-        res.json(test);
+      const test = await Test.findById(req.params.id);
+      if (!test) return res.status(404).json({ message: 'Test not found' });
+      res.json(test);
     } catch (err) {
-        res.status(500).send('Server error');
+      console.error(err);
+      res.status(500).send('Server error');
     }
-});
+  });
 
-// Student: Submit test
-router.post('/submit/:id', async (req, res) => {
+  // ---------------- Submit Test ----------------
+  router.post('/submit/:id', async (req, res) => {
     try {
-        const { studentName, studentEmail, answers } = req.body;
-        const test = await Test.findById(req.params.id);
-        if (!test) return res.status(404).send('Test not found.');
+      const { studentName, studentEmail, answers } = req.body;
+      const test = await Test.findById(req.params.id);
+      if (!test) return res.status(404).json({ message: 'Test not found' });
 
-        let score = 0;
-        test.questions.forEach((q, i) => {
-            if (q.correctAnswer === answers[i]) score++;
-        });
+      let score = 0;
+      test.questions.forEach((q, i) => {
+        if (answers[i] === q.correctAnswer) score++;
+      });
 
-        const newResult = new Result({
-            studentName,
-            studentEmail,
-            testId: req.params.id,
-            score,
-            totalQuestions: test.questions.length
-        });
-        await newResult.save();
+      const newResult = new Result({ studentName, studentEmail, testId: req.params.id, score, totalQuestions: test.questions.length });
+      await newResult.save();
 
-        res.json({
-            message: 'Test submitted successfully!',
-            score,
-            totalQuestions: test.questions.length
-        });
+      res.json({ message: 'Test submitted successfully!', score, totalQuestions: test.questions.length });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+      console.error(err);
+      res.status(500).send('Server error');
     }
-});
+  });
 
-// Teacher: Get results
-router.get('/results', async (req, res) => {
+  // Get All Results 
+  router.get('/results', async (req, res) => {
     try {
-        const results = await Result.find().populate('testId', 'title');
-        res.json(results);
+      const results = await Result.find().populate('testId', 'title section');
+      res.json(results);
     } catch (err) {
-        res.status(500).send('Server error');
+      console.error(err);
+      res.status(500).send('Server error');
     }
-});
+  });
 
-export default router;
+  //  Get Results by Test ID 
+  router.get('/results/:testId', async (req, res) => {
+    try {
+      const results = await Result.find({ testId: req.params.testId });
+      if (!results || results.length === 0) return res.status(404).json({ message: 'No results found for this test.' });
+      res.json(results);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+    }
+  });
+
+  // Admin: Get all tests
+  router.get('/admin/tests', async (req, res) => {
+    try {
+      const tests = await Test.find({}, 'title section difficulty');
+      res.json(tests);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+    }
+  });
+
+  // Admin: Delete a test
+  router.delete('/admin/tests/:id', async (req, res) => {
+    try {
+      const test = await Test.findByIdAndDelete(req.params.id);
+      if (!test) return res.status(404).json({ message: 'Test not found' });
+
+      await Result.deleteMany({ testId: req.params.id });
+      res.json({ message: 'Test deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Server error');
+    }
+  });
+
+
+  export default router;

@@ -1,14 +1,17 @@
-import { Schema, model } from 'mongoose';
+// models/Test.js
+import mongoose from "mongoose";
 
-const questionSchema = new Schema({
-    question: String,
-    options: [String],
-    correctAnswer: String
+const questionSchema = new mongoose.Schema({
+  question: String,
+  options: [String],
+  correctAnswer: String,
 });
 
-const testSchema = new Schema({
-    title: String,
-    questions: [questionSchema]
+const testSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  section: { type: String, required: true },     
+  difficulty: { type: String, required: true },  
+  questions: [questionSchema],
 });
 
-export default model('Test', testSchema);    
+export default mongoose.model("Test", testSchema);

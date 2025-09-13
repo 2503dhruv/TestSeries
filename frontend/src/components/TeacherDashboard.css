@@ -1,91 +1,162 @@
 /* TeacherDashboard.css */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #f0f2f5;
-  color: #333;
-  line-height: 1.6;
-}
 
 .TeacherDashboard {
-  max-width: 1000px;
-  margin: 20px auto;
+  max-width: 1100px;
+  margin: 40px auto;
   padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
 }
 
-.TeacherDashboard h1, .TeacherDashboard h2 {
-  color: #1a237e;
-  border-bottom: 2px solid #e0e0e0;
-  padding-bottom: 10px;
+.TeacherDashboard h1 {
+  text-align: center;
+  font-size: 2.3rem;
   margin-bottom: 20px;
+  color: #1e293b;
 }
 
+.TeacherDashboard h2 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+  color: #34495e;
+  border-left: 4px solid #3498db;
+  padding-left: 10px;
+}
+
+/* Upload Form */
 .TeacherDashboard form {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 15px;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
 }
 
-.TeacherDashboard form input[type="text"],
-.TeacherDashboard form input[type="file"] {
-  padding: 12px;
+.TeacherDashboard input[type="text"],
+.TeacherDashboard select,
+.TeacherDashboard input[type="file"] {
+  flex: 1 1 220px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1em;
+  border-radius: 8px;
+  outline: none;
+  transition: border 0.2s;
 }
 
-.TeacherDashboard form button {
-  background-color: #28a745;
-  color: #fff;
+.TeacherDashboard input[type="text"]:focus,
+.TeacherDashboard select:focus,
+.TeacherDashboard input[type="file"]:focus {
+  border-color: #3498db;
+}
+
+.TeacherDashboard button {
+  padding: 10px 18px;
+  background: #3498db;
+  color: white;
   border: none;
-  border-radius: 5px;
-  padding: 12px;
-  font-size: 1em;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s;
+  font-size: 0.95rem;
 }
 
-.TeacherDashboard form button:hover {
-  background-color: #218838;
+.TeacherDashboard button:hover {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.TeacherDashboard button:active {
+  transform: scale(0.97);
 }
 
 .TeacherDashboard p {
-  font-style: italic;
-  color: #6c757d;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #555;
 }
 
-.TeacherDashboard hr {
-  border: none;
-  border-top: 1px solid #e0e0e0;
-  margin: 30px 0;
-}
-
+/* Results Table */
 .TeacherDashboard table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.TeacherDashboard thead {
+  background: #1e293b;
+  color: white;
 }
 
 .TeacherDashboard th,
 .TeacherDashboard td {
-  text-align: left;
-  padding: 12px 15px;
-  border-bottom: 1px solid #ddd;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 0.95rem;
 }
 
-.TeacherDashboard thead {
-  background-color: #f8f9fa;
-  color: #495057;
-}
-
-.TeacherDashboard tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
+.TeacherDashboard tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
 }
 
 .TeacherDashboard tbody tr:hover {
-  background-color: #e9ecef;
+  background: #f9fafb;
+}
+
+.TeacherDashboard td {
+  color: #444;
+}
+
+.TeacherDashboard td:nth-child(5) {
+  font-weight: bold;
+  color: #2c5282;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .TeacherDashboard form {
+    flex-direction: column;
+  }
+
+  .TeacherDashboard thead {
+    display: none;
+  }
+
+  .TeacherDashboard table,
+  .TeacherDashboard tbody,
+  .TeacherDashboard tr,
+  .TeacherDashboard td {
+    display: block;
+    width: 100%;
+  }
+
+  .TeacherDashboard tr {
+    margin-bottom: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 12px;
+  }
+
+  .TeacherDashboard td {
+    text-align: right;
+    padding: 8px 12px;
+    position: relative;
+  }
+
+  .TeacherDashboard td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    font-weight: 600;
+    color: #555;
+  }
 }

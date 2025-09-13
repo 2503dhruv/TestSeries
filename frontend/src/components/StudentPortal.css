@@ -1,70 +1,138 @@
 /* StudentPortal.css */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #f0f2f5;
-  color: #333;
-  line-height: 1.6;
-}
 
-.StudentPortal h1 {
-  text-align: center;
-  color: #1a237e;
-  margin-bottom: 25px;
-  font-size: 2.5em;
-  font-weight: 700;
-}
-
-.StudentPortal ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.StudentPortal li {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.student-portal {
+  max-width: 1000px;
+  margin: 40px auto;
   padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
 }
 
-.StudentPortal li:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-}
-
-.StudentPortal li > span {
-  font-size: 1.2em;
-  font-weight: 600;
-  color: #424242;
-}
-
-.StudentPortal button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 20px;
-  font-size: 0.95em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.StudentPortal button:hover {
-  background-color: #0056b3;
-}
-
-.StudentPortal p {
+.student-portal h1 {
   text-align: center;
-  font-style: italic;
-  color: #6c757d;
-  margin-top: 30px;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  color: #2c3e50;
+}
+
+/* Loading & No tests */
+.loading-message,
+.student-portal p {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+/* Table Styling */
+.tests-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.tests-table thead {
+  background: #2c3e50;
+  color: #fff;
+}
+
+.tests-table th,
+.tests-table td {
+  padding: 14px 16px;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.tests-table tbody tr {
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s ease-in-out;
+}
+
+.tests-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Difficulty badges */
+.difficulty {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.difficulty.easy {
+  background: #d4edda;
+  color: #155724;
+}
+
+.difficulty.medium {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.difficulty.hard {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Start Test Button */
+.start-test-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.start-test-btn:hover {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.start-test-btn:active {
+  transform: scale(0.97);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tests-table thead {
+    display: none;
+  }
+
+  .tests-table,
+  .tests-table tbody,
+  .tests-table tr,
+  .tests-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .tests-table tr {
+    margin-bottom: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    padding: 12px;
+  }
+
+  .tests-table td {
+    text-align: right;
+    padding: 8px 12px;
+    position: relative;
+  }
+
+  .tests-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    font-weight: 600;
+    color: #555;
+  }
 }
