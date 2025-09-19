@@ -18,9 +18,9 @@ const Navbar = () => {
         <li>
           <Link to="/teacher">Teacher Dashboard</Link>
         </li>
-        <li>
+        {/* <li>
           <Link to="/admin">Admin Panel</Link>
-        </li>
+        </li> */}
       </ul>
     </nav>
   );

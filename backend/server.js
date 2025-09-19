@@ -2,6 +2,7 @@ import express, { json, urlencoded } from 'express';
 import { connect } from 'mongoose';
 import cors from 'cors';
 import testRoutes from './routes/testRoutes.js';
+import adminRoutes from "./routes/adminRoutes.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use(urlencoded({ extended: true }));
 
 // Routes
 app.use('/api', testRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

@@ -121,30 +121,30 @@ router.post(
     }
   });
 
-  // Admin: Get all tests
-  router.get('/admin/tests', async (req, res) => {
-    try {
-      const tests = await Test.find({}, 'title section difficulty');
-      res.json(tests);
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Server error');
-    }
-  });
+  // // Admin: Get all tests
+  // router.get('/admin/tests', async (req, res) => {
+  //   try {
+  //     const tests = await Test.find({}, 'title section difficulty');
+  //     res.json(tests);
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).send('Server error');
+  //   }
+  // });
 
-  // Admin: Delete a test
-  router.delete('/admin/tests/:id', async (req, res) => {
-    try {
-      const test = await Test.findByIdAndDelete(req.params.id);
-      if (!test) return res.status(404).json({ message: 'Test not found' });
+  // // Admin: Delete a test
+  // router.delete('/admin/tests/:id', async (req, res) => {
+  //   try {
+  //     const test = await Test.findByIdAndDelete(req.params.id);
+  //     if (!test) return res.status(404).json({ message: 'Test not found' });
 
-      await Result.deleteMany({ testId: req.params.id });
-      res.json({ message: 'Test deleted successfully' });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Server error');
-    }
-  });
+  //     await Result.deleteMany({ testId: req.params.id });
+  //     res.json({ message: 'Test deleted successfully' });
+  //   } catch (err) {
+  //     console.error(err);
+  //     res.status(500).send('Server error');
+  //   }
+  // });
 
 
   router.get('/ping', (req, res) => {

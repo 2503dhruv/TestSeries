@@ -1,200 +1,275 @@
-/* AdminPortal.css */
-
+/* ===========================
+   General Layout
+=========================== */
 .admin-panel {
   max-width: 1100px;
   margin: 40px auto;
-  padding: 20px;
+  padding: 30px 40px;
+  background: #fdfdfd;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #2c3e50;
+  transition: all 0.3s ease-in-out;
 }
 
 .admin-panel h1 {
-  text-align: center;
-  font-size: 2.2rem;
+  font-size: 28px;
   margin-bottom: 25px;
-  color: #1e293b;
-}
-
-.loading-message,
-.error-message {
   text-align: center;
-  font-size: 1.1rem;
-  margin: 15px 0;
+  color: #222;
+  font-weight: 600;
 }
 
+/* ===========================
+   Admin Login
+=========================== */
+.admin-login {
+  max-width: 420px;
+  width: 100%;
+  margin: 20px;
+  padding: 40px 35px;
+  background: #e5e7eb;
+  border-radius: 20px; /* Softer corners */
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12); /* Softer, deeper shadow */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admin-login:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Heading Styling --- */
+.admin-login h2 {
+  margin-bottom: 30px;
+  color: #1a202c; /* Darker, more professional color */
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: -0.5px;
+}
+
+/* --- Input Field Styling --- */
+.admin-login input {
+  width: 100%;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border: 1px solid #dcdfe6;
+  border-radius: 10px;
+  font-size: 16px;
+  background-color: #f7f8fa;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.admin-login input::placeholder {
+  color: #a0aec0;
+}
+
+.admin-login input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+}
+
+/* --- Button Styling --- */
+.admin-login button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #4a90e2, #50e3c2);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+}
+
+.admin-login button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+}
+
+.admin-login button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+/* ===========================
+   Error + Loading
+=========================== */
 .error-message {
-  color: #dc2626;
+  color: #d93025;
+  margin-bottom: 18px;
+  text-align: center;
   font-weight: bold;
+  font-size: 15px;
 }
 
-/* Test Table */
+.loading-message {
+  text-align: center;
+  font-size: 16px;
+  margin: 40px 0;
+  color: #555;
+}
+
+/* ===========================
+   Table
+=========================== */
 .test-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.test-table thead {
-  background: #1e293b;
-  color: white;
+  margin-top: 25px;
+  font-size: 14px;
 }
 
 .test-table th,
 .test-table td {
-  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  padding: 14px;
   text-align: center;
-  font-size: 0.95rem;
-}
-
-.test-table tbody tr {
-  border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s;
 }
 
-.test-table tbody tr:hover {
-  background: #f9fafb;
+.test-table th {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #222;
 }
 
+.test-table tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.test-table tr:hover {
+  background: #e8f0fe;
+}
+
+/* ===========================
+   Buttons
+=========================== */
 .view-btn,
-.delete-btn {
-  padding: 8px 14px;
+.delete-btn,
+.logout-btn,
+.close-btn {
+  padding: 8px 16px;
+  margin: 3px;
   border: none;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  margin-right: 6px;
   transition: all 0.2s;
 }
 
 .view-btn {
-  background: #3b82f6;
-  color: white;
+  background: #28a745;
+  color: #fff;
 }
-
 .view-btn:hover {
-  background: #2563eb;
+  background: #218838;
+  transform: translateY(-1px);
 }
 
 .delete-btn {
-  background: #ef4444;
-  color: white;
+  background: #dc3545;
+  color: #fff;
 }
-
 .delete-btn:hover {
-  background: #dc2626;
+  background: #b02a37;
+  transform: translateY(-1px);
 }
 
-.delete-btn:disabled {
-  background: #fca5a5;
-  cursor: not-allowed;
+.logout-btn {
+  background: #6c757d;
+  color: #fff;
+  margin-bottom: 20px;
 }
-
-/* Modal Styling */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-.modal-content {
-  background: white;
-  padding: 25px;
-  max-width: 700px;
-  width: 90%;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-  overflow-y: auto;
-  max-height: 90vh;
-}
-
-.modal-content h2 {
-  margin-bottom: 10px;
-  color: #1e293b;
-}
-
-.modal-content h3 {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-  color: #334155;
-}
-
-.modal-content ol {
-  padding-left: 18px;
-}
-
-.modal-content li {
-  margin-bottom: 15px;
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 8px;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.modal-content ul {
-  margin: 8px 0;
-  padding-left: 20px;
-}
-
-.modal-content p {
-  margin: 5px 0;
+.logout-btn:hover {
+  background: #565e64;
+  transform: translateY(-1px);
 }
 
 .close-btn {
-  margin-top: 20px;
-  padding: 10px 18px;
-  background: #64748b;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
+  background: #007bff;
+  color: #fff;
 }
-
 .close-btn:hover {
-  background: #475569;
+  background: #0056b3;
+  transform: translateY(-1px);
 }
 
-/* Responsive */
+/* ===========================
+   Modal
+=========================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  max-width: 750px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.modal-content h2 {
+  margin-bottom: 15px;
+  color: #222;
+  font-weight: 600;
+}
+
+.modal-content h3 {
+  margin-top: 25px;
+  color: #007bff;
+  font-weight: 500;
+}
+
+/* ===========================
+   Animations
+=========================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ===========================
+   Responsive
+=========================== */
 @media (max-width: 768px) {
-  .test-table thead {
-    display: none;
+  .admin-panel {
+    padding: 20px;
   }
 
-  .test-table,
-  .test-table tbody,
-  .test-table tr,
-  .test-table td {
-    display: block;
-    width: 100%;
+  .admin-login {
+    padding: 25px 20px;
   }
 
-  .test-table tr {
-    margin-bottom: 15px;
-    background: #fff;
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  }
-
-  .test-table td {
-    text-align: right;
-    padding: 8px 12px;
-    position: relative;
-  }
-
-  .test-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 12px;
-    font-weight: 600;
-    color: #555;
+  .modal-content {
+    padding: 20px 15px;
   }
 }
