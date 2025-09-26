@@ -77,26 +77,35 @@ router.post(
   });
 
   // ---------------- Submit Test ----------------
-  router.post('/submit/:id', async (req, res) => {
-    try {
-      const { studentName, studentEmail, answers } = req.body;
-      const test = await Test.findById(req.params.id);
-      if (!test) return res.status(404).json({ message: 'Test not found' });
+router.post('/submit/:id', async (req, res) => {
+  try {
+    const { studentName, studentEmail, answers } = req.body;
+    const test = await Test.findById(req.params.id);
+    if (!test) return res.status(404).json({ message: 'Test not found' });
 
-      let score = 0;
-      test.questions.forEach((q, i) => {
-        if (answers[i] === q.correctAnswer) score++;
-      });
+    let score = 0;
+    test.questions.forEach((q) => {
+      const qId = q._id.toString(); 
+      if (answers[qId] === q.correctAnswer) score++;
+    });
 
-      const newResult = new Result({ studentName, studentEmail, testId: req.params.id, score, totalQuestions: test.questions.length });
-      await newResult.save();
+    const newResult = new Result({
+      studentName,
+      studentEmail,
+      testId: req.params.id,
+      score,
+      totalQuestions: test.questions.length,
+    });
 
-      res.json({ message: 'Test submitted successfully!', score, totalQuestions: test.questions.length });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send('Server error');
-    }
-  });
+    await newResult.save();
+    res.json({ message: 'Test submitted successfully!', score, totalQuestions: test.questions.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
+
+
 
   // Get All Results 
   router.get('/results', async (req, res) => {

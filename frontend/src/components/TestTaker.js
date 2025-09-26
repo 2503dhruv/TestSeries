@@ -14,8 +14,10 @@ const TestTaker = () => {
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Fetch test after acceptance
   useEffect(() => {
     const fetchTest = async () => {
+      setLoading(true);
       try {
         const { data } = await API.get(`/tests/${id}`);
         setTest(data);
@@ -28,28 +30,44 @@ const TestTaker = () => {
     if (accepted) fetchTest();
   }, [id, accepted]);
 
+  // Handle option change
   const handleAnswerChange = (questionId, selectedOption) => {
+    const qId = questionId.toString(); // convert ObjectId to string
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: selectedOption,
+      [qId]: selectedOption,
     }));
   };
 
+  // Submit test
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Optional: alert if some questions are unanswered
+    if (Object.keys(answers).length !== test.questions.length) {
+      if (
+        !window.confirm(
+          "Some questions are unanswered. Do you still want to submit?"
+        )
+      )
+        return;
+    }
+
     try {
       const { data } = await API.post(`/submit/${id}`, {
         studentName,
         studentEmail,
-        answers: test.questions.map((q) => answers[q._id]),
+        answers, // answers keyed by string questionId
       });
       setScore(data.score);
       setShowResults(true);
     } catch (error) {
       console.error("Failed to submit test:", error);
+      alert("Failed to submit test. Please try again.");
     }
   };
 
+  // Render: Start Form
   if (!accepted) {
     return (
       <div className="TestTaker">
@@ -57,7 +75,7 @@ const TestTaker = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            setAccepted(true);
+            if (studentName && studentEmail) setAccepted(true);
           }}
         >
           <label>Name:</label>
@@ -86,7 +104,10 @@ const TestTaker = () => {
             I accept the terms and conditions.
           </label>
           <br />
-          <button type="submit" disabled={!studentName || !studentEmail}>
+          <button
+            type="submit"
+            disabled={!studentName || !studentEmail || !accepted}
+          >
             Start Test
           </button>
         </form>
@@ -94,8 +115,10 @@ const TestTaker = () => {
     );
   }
 
+  // Render: Loading state
   if (loading) return <div className="TestTaker loading">Loading test...</div>;
 
+  // Render: Results
   if (showResults) {
     return (
       <div className="TestTaker results-display">
@@ -107,33 +130,43 @@ const TestTaker = () => {
     );
   }
 
+  // Render: Test questions
   return (
     <div className="TestTaker">
       <h1>{test?.title}</h1>
       <form onSubmit={handleSubmit}>
-        {test?.questions.map((q, index) => (
-          <div key={q._id} className="question-container">
-            <h3>
-              {index + 1}. {q.question}
-            </h3>
-            {q.options.map((option) => (
-              <label key={option}>
-                <input
-                  type="radio"
-                  name={`question-${q._id}`}
-                  value={option}
-                  checked={answers[q._id] === option}
-                  onChange={() => handleAnswerChange(q._id, option)}
-                />
-                {option}
-              </label>
-            ))}
-          </div>
-        ))}
-        <button type="submit">Submit Test</button>
+        {test?.questions.map((q, index) => {
+          const qId = q._id.toString(); // convert ObjectId to string
+          return (
+            <div key={qId} className="question-container">
+              <h3>
+                {index + 1}. {q.question}
+              </h3>
+              {q.options.map((option, i) => (
+                <label key={i}>
+                  <input
+                    type="radio"
+                    name={`question-${qId}`}
+                    value={option}
+                    checked={answers[qId] === option}
+                    onChange={() => handleAnswerChange(qId, option)}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+          );
+        })}
+
+        <button
+          type="submit"
+          disabled={Object.keys(answers).length === 0} 
+        >
+          Submit Test
+        </button>
       </form>
     </div>
   );
 };
 
-export default TestTaker;
+export default TestTaker;  
