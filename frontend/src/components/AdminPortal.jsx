@@ -4,42 +4,21 @@ import API from "../api";
 
 const AdminPanel = () => {
   const [tests, setTests] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [viewingTest, setViewingTest] = useState(null); // for modal
   const [error, setError] = useState(null);
   const [hasKey, setHasKey] = useState(!!sessionStorage.getItem("adminKey"));
 
-  // Validate admin key immediately
-  const validateKey = async (key) => {
-    if (!key) return false;
-    try {
-      // Temporarily set the key in sessionStorage for the interceptor
+  // Prompt for admin key
+  const promptAdminKey = () => {
+    const key = prompt(
+      "Enter Admin Security Key (must match the deployed backend key):"
+    );
+    if (key) {
       sessionStorage.setItem("adminKey", key.trim());
-      await API.get("/admin/tests"); // test endpoint
-      return true;
-    } catch (err) {
-      console.error("Admin key validation failed:", err);
-      sessionStorage.removeItem("adminKey");
-      return false;
-    }
-  };
-
-  const handleAdminLogin = async () => {
-    const key = prompt("Enter Admin Security Key:");
-    if (!key) return;
-
-    setLoading(true);
-    const valid = await validateKey(key);
-    setLoading(false);
-
-    if (valid) {
       setHasKey(true);
       setError(null);
-      fetchTests(); // fetch tests immediately
-    } else {
-      setHasKey(false);
-      setError("Invalid Admin Key. Please try again.");
     }
   };
 
@@ -51,13 +30,15 @@ const AdminPanel = () => {
       const { data } = await API.get("/admin/tests");
       setTests(data);
     } catch (err) {
-      console.error("Error fetching tests:", err);
       if (err.response?.status === 403) {
-        setError("Invalid Admin Key. Please login again.");
         sessionStorage.removeItem("adminKey");
         setHasKey(false);
+        setError(
+          "Invalid or missing Admin Key. Please enter the correct key to access tests."
+        );
       } else {
-        setError("Failed to load tests.");
+        setError("Failed to load tests. Please try again later.");
+        console.error(err);
       }
     } finally {
       setLoading(false);
@@ -66,18 +47,18 @@ const AdminPanel = () => {
 
   useEffect(() => {
     if (hasKey) fetchTests();
+    else setLoading(false);
   }, [hasKey]);
 
   // Delete a test
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this test?")) return;
-
     try {
       setDeletingId(id);
       await API.delete(`/admin/tests/${id}`);
       setTests((prev) => prev.filter((test) => test._id !== id));
     } catch (err) {
-      console.error("Failed to delete test:", err);
+      console.error(err);
       setError("Failed to delete test.");
     } finally {
       setDeletingId(null);
@@ -90,22 +71,21 @@ const AdminPanel = () => {
       const { data } = await API.get(`/tests/${id}`);
       setViewingTest(data);
     } catch (err) {
-      console.error("Failed to fetch test details:", err);
+      console.error(err);
       setError("Failed to fetch test details.");
     }
   };
 
   const closeModal = () => setViewingTest(null);
 
-  // --- UI Rendering ---
+  // --- UI ---
   if (!hasKey) {
     return (
       <div className="admin-login">
         <h2>Admin Access Required</h2>
-        <button className="login-btn" onClick={handleAdminLogin}>
+        <button className="login-btn" onClick={promptAdminKey}>
           Enter Admin Key
         </button>
-        {loading && <div className="loading-message">Validating key...</div>}
         {error && <div className="error-message">{error}</div>}
       </div>
     );
@@ -137,10 +117,7 @@ const AdminPanel = () => {
                 <td>{test.section || "-"}</td>
                 <td>{test.difficulty || "-"}</td>
                 <td>
-                  <button
-                    className="view-btn"
-                    onClick={() => viewDetails(test._id)}
-                  >
+                  <button className="view-btn" onClick={() => viewDetails(test._id)}>
                     View Details
                   </button>
                   <button
@@ -157,14 +134,17 @@ const AdminPanel = () => {
         </table>
       )}
 
-      {/* Modal for viewing test questions */}
+      {/* Modal */}
       {viewingTest && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{viewingTest.title}</h2>
-            <p><strong>Section:</strong> {viewingTest.section || "-"}</p>
-            <p><strong>Difficulty:</strong> {viewingTest.difficulty || "-"}</p>
-
+            <p>
+              <strong>Section:</strong> {viewingTest.section || "-"}
+            </p>
+            <p>
+              <strong>Difficulty:</strong> {viewingTest.difficulty || "-"}
+            </p>
             <h3>Questions:</h3>
             <ol>
               {viewingTest.questions?.map((q, idx) => (
@@ -175,11 +155,12 @@ const AdminPanel = () => {
                       <li key={i}>{opt}</li>
                     ))}
                   </ul>
-                  <p><strong>Answer:</strong> {q.correctAnswer}</p>
+                  <p>
+                    <strong>Answer:</strong> {q.correctAnswer}
+                  </p>
                 </li>
               ))}
             </ol>
-
             <button className="close-btn" onClick={closeModal}>
               Close
             </button>

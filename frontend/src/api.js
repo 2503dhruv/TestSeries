@@ -21,8 +21,10 @@
 
 // export default API;
 // api.js
+// api.js
 import axios from "axios";
 
+// Environment-based baseURL
 const API = axios.create({
   baseURL:
     process.env.NODE_ENV === "production"
@@ -30,14 +32,39 @@ const API = axios.create({
       : "http://localhost:5100/api",
 });
 
-API.interceptors.request.use((config) => {
-  const adminKey = sessionStorage.getItem("adminKey");
+// Interceptor to attach admin key for /admin routes
+API.interceptors.request.use(
+  (config) => {
+    const adminKey = sessionStorage.getItem("adminKey");
 
-  if (config.url.startsWith("/admin") && adminKey) {
-    config.headers["x-admin-key"] = adminKey.trim();
+    if (config.url.startsWith("/admin")) {
+      if (!adminKey) {
+        console.warn(
+          "Admin key missing! This /admin request will likely fail with 403."
+        );
+      } else {
+        config.headers["x-admin-key"] = adminKey.trim();
+      }
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Optional: global response interceptor to handle 403 automatically
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 403) {
+      console.warn(
+        "Received 403 from server. Admin key may be missing or invalid."
+      );
+      sessionStorage.removeItem("adminKey"); 
+    }
+    return Promise.reject(error);
   }
-
-  return config;
-});
+);
 
 export default API;
+
