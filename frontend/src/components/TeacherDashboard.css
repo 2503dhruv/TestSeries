@@ -160,3 +160,29 @@
     color: #555;
   }
 }
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.clear-results-btn {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-results-btn:hover {
+  background-color: #ff7875;
+}
+
+.clear-results-btn:disabled {
+  background-color: #ffa6a6;
+  cursor: not-allowed;
+}
+

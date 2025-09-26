@@ -3,6 +3,7 @@ import { connect } from 'mongoose';
 import cors from 'cors';
 import testRoutes from './routes/testRoutes.js';
 import adminRoutes from "./routes/adminRoutes.js";
+import resultRoutes from "./routes/resultRoutes.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(urlencoded({ extended: true }));
 // Routes
 app.use('/api', testRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/results', resultRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {

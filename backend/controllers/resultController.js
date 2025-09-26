@@ -4,7 +4,7 @@ import Test from "../models/Test.js";
 // Get all results
 const getResults = async (req, res) => {
   try {
-    const results = await Result.find().populate("testId", "title");
+    const results = await Result.find().populate("testId", "title section");
     res.json(results);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -30,7 +30,7 @@ const submitTest = async (req, res) => {
       studentEmail,
       testId: id,
       score,
-      totalQuestions: test.questions.length
+      totalQuestions: test.questions.length,
     });
 
     await result.save();
@@ -40,4 +40,14 @@ const submitTest = async (req, res) => {
   }
 };
 
-export default { getResults, submitTest };
+// NEW: Clear all results
+const clearAllResults = async (req, res) => {
+  try {
+    await Result.deleteMany({});
+    res.status(200).json({ message: "All results cleared successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to clear results" });
+  }
+};
+
+export default { getResults, submitTest, clearAllResults };

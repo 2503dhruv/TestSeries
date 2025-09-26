@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: "https://testseries-1vg0.onrender.com/api",
+  // baseURL: "http://localhost:5100/api",
 });
 
 // Add admin key only for /admin routes

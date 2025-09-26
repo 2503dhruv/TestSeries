@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getResults, submitTest } from "../controllers/resultController.js";
+const { getResults, submitTest, clearAllResults } = resultController;
+import resultController from "../controllers/resultController.js";
 
 const router = Router();
 
@@ -8,5 +9,8 @@ router.get("/", getResults);
 
 // Submit test answers
 router.post("/submit/:id", submitTest);
+
+// Clear all results
+router.delete("/clear", clearAllResults);
 
 export default router;

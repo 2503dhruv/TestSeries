@@ -9,6 +9,7 @@ const TeacherDashboard = () => {
   const [testDifficulty, setTestDifficulty] = useState("Easy"); 
   const [uploadStatus, setUploadStatus] = useState("");
   const [results, setResults] = useState([]);
+  const [deleting, setDeleting] = useState(false); // NEW: loading state
 
   useEffect(() => {
     fetchResults();
@@ -27,45 +28,59 @@ const TeacherDashboard = () => {
     setFile(e.target.files[0]);
   };
 
-const handleUpload = async (e) => {
-  e.preventDefault();
+  const handleUpload = async (e) => {
+    e.preventDefault();
 
-  if (!file || !testTitle || !testSection || !testDifficulty) {
-    setUploadStatus("Please fill in all fields and select a file.");
-    return;
-  }
+    if (!file || !testTitle || !testSection || !testDifficulty) {
+      setUploadStatus("Please fill in all fields and select a file.");
+      return;
+    }
 
-  setUploadStatus("Uploading...");
+    setUploadStatus("Uploading...");
 
-  const formData = new FormData();
-  formData.append("file", file);             // must match backend: file
-  formData.append("title", testTitle);       // must match backend: title
-  formData.append("section", testSection);   // must match backend: section
-  formData.append("difficulty", testDifficulty); // must match backend: difficulty
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("title", testTitle);
+    formData.append("section", testSection);
+    formData.append("difficulty", testDifficulty);
 
-  try {
-    const { data } = await API.post("/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    try {
+      const { data } = await API.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-    console.log("Uploaded Test:", data.test);
+      console.log("Uploaded Test:", data.test);
 
-    setUploadStatus("Upload successful!");
-    setTestTitle("");
-    setTestSection("");
-    setTestDifficulty("Easy");
-    setFile(null);
-    document.getElementById("file-upload").value = "";
+      setUploadStatus("Upload successful!");
+      setTestTitle("");
+      setTestSection("");
+      setTestDifficulty("Easy");
+      setFile(null);
+      document.getElementById("file-upload").value = "";
 
-    fetchResults(); // refresh results after upload
-  } catch (error) {
-    setUploadStatus("Error: " + (error.response?.data?.error || error.message));
-    console.error("Upload failed:", error);
-  }
-};
+      fetchResults();
+    } catch (error) {
+      setUploadStatus("Error: " + (error.response?.data?.error || error.message));
+      console.error("Upload failed:", error);
+    }
+  };
 
+  // UPDATED: Clear results with backend
+  const clearResults = async () => {
+    if (!window.confirm("Are you sure you want to delete all results?")) return;
 
-
+    try {
+      setDeleting(true);
+      await API.delete("/results/clear");
+      setResults([]);
+      alert("All results have been deleted!");
+    } catch (error) {
+      console.error("Failed to clear results:", error);
+      alert("Failed to delete results from server");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="TeacherDashboard">
@@ -81,7 +96,6 @@ const handleUpload = async (e) => {
           required
         />
         
-        
         <select
           value={testSection}
           onChange={(e) => setTestSection(e.target.value)}
@@ -96,7 +110,6 @@ const handleUpload = async (e) => {
           <option value="SQL">SQL</option>
         </select>
 
-        
         <select
           value={testDifficulty}
           onChange={(e) => setTestDifficulty(e.target.value)}
@@ -120,7 +133,19 @@ const handleUpload = async (e) => {
 
       <hr />
 
-      <h2>Test Results</h2>
+      <div className="results-header">
+        <h2>Test Results</h2>
+        {results.length > 0 && (
+          <button
+            className="clear-results-btn"
+            onClick={clearResults}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting..." : "✖ Clear Results"}
+          </button>
+        )}
+      </div>
+
       {results.length === 0 ? (
         <p>No test results to display.</p>
       ) : (
@@ -140,7 +165,6 @@ const handleUpload = async (e) => {
               <tr key={result._id}>
                 <td>{result.studentName}</td>
                 <td>{result.studentEmail}</td>
-                
                 <td>{result.testId?.section || "N/A"}</td>
                 <td>{result.testId?.title || "Unknown Test"}</td>
                 <td>
