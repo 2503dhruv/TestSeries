@@ -5,12 +5,15 @@ const API = axios.create({
   // baseURL: "http://localhost:5100/api",
 });
 
-// Add admin key only for /admin routes
 API.interceptors.request.use((config) => {
   const adminKey = sessionStorage.getItem("adminKey");
 
-  if (adminKey && config.url.startsWith("/admin")) {
-    config.headers["x-admin-key"] = adminKey;
+  if (config.url.startsWith("/admin")) {
+    if (!adminKey) {
+      console.warn("Admin key missing! This request will fail.");
+    } else {
+      config.headers["x-admin-key"] = adminKey.trim(); 
+    }
   }
 
   return config;

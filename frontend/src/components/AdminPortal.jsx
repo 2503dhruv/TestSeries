@@ -4,48 +4,68 @@ import API from "../api";
 
 const AdminPanel = () => {
   const [tests, setTests] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [viewingTest, setViewingTest] = useState(null); // for modal
   const [error, setError] = useState(null);
-  const [hasKey, setHasKey] = useState(!!sessionStorage.getItem("adminKey")); // check if key exists
+  const [hasKey, setHasKey] = useState(!!sessionStorage.getItem("adminKey"));
 
-  // Handle admin login (prompt for key)
-  const handleAdminLogin = () => {
-    const key = prompt("Enter Admin Security Key:");
-    if (key) {
-      sessionStorage.setItem("adminKey", key);
-      setHasKey(true);
-      window.location.reload();
+  // Validate admin key immediately
+  const validateKey = async (key) => {
+    if (!key) return false;
+    try {
+      // Temporarily set the key in sessionStorage for the interceptor
+      sessionStorage.setItem("adminKey", key.trim());
+      await API.get("/admin/tests"); // test endpoint
+      return true;
+    } catch (err) {
+      console.error("Admin key validation failed:", err);
+      sessionStorage.removeItem("adminKey");
+      return false;
     }
   };
 
-  // Fetch all tests (only if admin key is available)
-  useEffect(() => {
-    if (!hasKey) {
-      setLoading(false);
-      return;
+  const handleAdminLogin = async () => {
+    const key = prompt("Enter Admin Security Key:");
+    if (!key) return;
+
+    setLoading(true);
+    const valid = await validateKey(key);
+    setLoading(false);
+
+    if (valid) {
+      setHasKey(true);
+      setError(null);
+      fetchTests(); // fetch tests immediately
+    } else {
+      setHasKey(false);
+      setError("Invalid Admin Key. Please try again.");
     }
+  };
 
-    const fetchTests = async () => {
-      try {
-        const { data } = await API.get("/admin/tests");
-        setTests(data);
-      } catch (err) {
-        console.error("Error fetching tests:", err);
-        if (err.response?.status === 403) {
-          setError("Invalid Admin Key. Please login again.");
-          sessionStorage.removeItem("adminKey");
-          setHasKey(false);
-        } else {
-          setError("Failed to load tests.");
-        }
-      } finally {
-        setLoading(false);
+  // Fetch all tests
+  const fetchTests = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { data } = await API.get("/admin/tests");
+      setTests(data);
+    } catch (err) {
+      console.error("Error fetching tests:", err);
+      if (err.response?.status === 403) {
+        setError("Invalid Admin Key. Please login again.");
+        sessionStorage.removeItem("adminKey");
+        setHasKey(false);
+      } else {
+        setError("Failed to load tests.");
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchTests();
+  useEffect(() => {
+    if (hasKey) fetchTests();
   }, [hasKey]);
 
   // Delete a test
@@ -85,6 +105,7 @@ const AdminPanel = () => {
         <button className="login-btn" onClick={handleAdminLogin}>
           Enter Admin Key
         </button>
+        {loading && <div className="loading-message">Validating key...</div>}
         {error && <div className="error-message">{error}</div>}
       </div>
     );
@@ -95,7 +116,6 @@ const AdminPanel = () => {
   return (
     <div className="admin-panel">
       <h1>Admin Panel - Manage Tests</h1>
-
       {error && <div className="error-message">{error}</div>}
 
       {tests.length === 0 ? (
