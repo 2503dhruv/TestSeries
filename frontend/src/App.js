@@ -6,6 +6,7 @@ import TeacherDashboard from './components/TeacherDashboard';
 import AdminPanel from './components/AdminPortal.jsx';
 import PublicLayout from './components/layouts/PublicLayout';
 import AdminLayout from './components/layouts/adminlayout.js';
+import Quizes from './components/Quizes';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,6 +20,7 @@ function App() {
                     <Route path="/Student" element={<StudentPortal />} />
                     <Route path="/test/:id" element={<TestTaker />} />
                     <Route path="/teacher" element={<TeacherDashboard />} />
+                    <Route path="/quizes" element={<Quizes />} />
                 </Route>
 
                 
