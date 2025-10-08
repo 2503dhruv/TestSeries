@@ -19,7 +19,7 @@ const Navbar = () => {
           <Link to="/teacher">Teacher Dashboard</Link>
         </li>
         {/* <li>
-          <Link to="/admin">Admin Panel</Link>
+          <Link   to="/admin">Admin Panel</Link>
         </li> */}
       </ul>
     </nav>
