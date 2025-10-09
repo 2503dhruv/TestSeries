@@ -372,3 +372,193 @@ html, body, #root {
   .completed-row { margin-top: 5px; }
   .tests-view { padding: 18px 10px 7px 10px; }
 }
+.filters-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.search-input, .filter-select, .sort-select {
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+.tests-view .test-table th:first-child,
+.tests-view .test-table td:first-child {
+  width: 30px;
+  text-align: center;
+}
+.bulk-delete-btn {
+  margin-bottom: 14px;
+  background-color: #e03636;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+.bulk-delete-btn:hover {
+  background-color: #b22a2a;
+}
+
+.results-view {
+  width: 100%;
+  padding: 44px 32px 50px 54px;
+  display: flex;
+  flex-direction: column;
+}
+
+.results-view h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #23305d;
+  margin-bottom: 22px;
+  letter-spacing: 0.08em;
+}
+
+.results-view table.test-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 1.06rem;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 20px rgba(44, 222, 180, 0.055);
+  table-layout: fixed;
+}
+
+/* Set column min-widths to prevent header wrapping */
+.results-view table.test-table th,
+.results-view table.test-table td {
+  border: 1px solid #e2e9f4;
+  padding: 12px 12px;
+  text-align: center;
+  transition: background 0.18s;
+  vertical-align: middle;
+  word-break: break-word;
+  min-width: 120px;
+}
+
+.results-view table.test-table th:first-child,
+.results-view table.test-table td:first-child {
+  min-width: 160px;  /* Student Name */
+}
+.results-view table.test-table th:nth-child(2),
+.results-view table.test-table td:nth-child(2) {
+  min-width: 180px;  /* Email */
+}
+.results-view table.test-table th:nth-child(3),
+.results-view table.test-table td:nth-child(3) {
+  min-width: 120px;  /* Section */
+}
+.results-view table.test-table th:nth-child(4),
+.results-view table.test-table td:nth-child(4) {
+  min-width: 160px;  /* Test Title */
+}
+.results-view table.test-table th:nth-child(5),
+.results-view table.test-table td:nth-child(5) {
+  min-width: 100px;  /* Score */
+}
+.results-view table.test-table th:nth-child(6),
+.results-view table.test-table td:nth-child(6) {
+  min-width: 120px;  /* Date */
+}
+
+.results-view table.test-table th {
+  background: #e9f2fd;
+  color: #295ab1;
+  font-weight: 600;
+}
+
+.results-view table.test-table tr:nth-child(even) {
+  background: #f7fbfd;
+}
+.results-view table.test-table tr:hover {
+  background: #d4e7fc;
+  transition: background 0.13s;
+}
+
+.results-view table.test-table tbody {
+  display: table-row-group;
+  max-height: none;
+  overflow: unset;
+}
+.results-view table.test-table tbody tr {
+  display: table-row;
+  width: auto;
+  table-layout: auto;
+}
+
+.results-view td:nth-child(5) {
+  font-weight: 700;
+  color: #2c7a7b;
+}
+
+.results-view .error-message,
+.results-view .loading-message,
+.results-view div {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 36px;
+  color: #b33a3a;
+}
+
+/* Responsive: stacking for mobile only */
+@media (max-width: 900px) {
+  .results-view {
+    padding: 20px 15px;
+  }
+  .results-view table.test-table,
+  .results-view table.test-table thead,
+  .results-view table.test-table tbody,
+  .results-view table.test-table tr,
+  .results-view table.test-table th,
+  .results-view table.test-table td {
+    display: block;
+  }
+  .results-view table.test-table thead tr {
+    display: none;
+  }
+  .results-view table.test-table tbody tr {
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 10px;
+  }
+  .results-view table.test-table tbody td {
+    border: none;
+    padding: 8px 0;
+    text-align: left;
+    position: relative;
+    padding-left: 50%;
+    min-width: unset !important;
+  }
+  .results-view table.test-table tbody td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    top: 8px;
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+
+
+.results-view .error-message,
+.results-view .loading-message,
+.results-view div {
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-align: center;
+  margin-top: 36px;
+  color: #b33a3a;
+}
+
+
+.results-view td:nth-child(5) {
+  font-weight: 700;
+  color: #2c7a7b;
+}

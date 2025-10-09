@@ -5,7 +5,6 @@ import adminAuth from "../middleware/adminauth.js";
 
 const router = Router();
 
-// ✅ Admin: Get all tests
 router.get("/tests", adminAuth, async (req, res) => {
   try {
     const tests = await Test.find({}, "title section difficulty");
@@ -16,7 +15,6 @@ router.get("/tests", adminAuth, async (req, res) => {
   }
 });
 
-// ✅ Admin: Delete a test
 router.delete("/tests/:id", adminAuth, async (req, res) => {
   try {
     const test = await Test.findByIdAndDelete(req.params.id);
@@ -29,5 +27,29 @@ router.delete("/tests/:id", adminAuth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+router.get("/results", adminAuth, async (req, res) => {
+  try {
+    const results = await Result.find().populate("testId", "title section");
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.get("/results/:testId", adminAuth, async (req, res) => {
+  try {
+    const results = await Result.find({ testId: req.params.testId });
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: "No results found for this test." });
+    }
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
 
 export default router;

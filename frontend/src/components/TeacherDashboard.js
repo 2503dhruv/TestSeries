@@ -9,7 +9,7 @@ const TeacherDashboard = () => {
   const [testDifficulty, setTestDifficulty] = useState("Easy"); 
   const [uploadStatus, setUploadStatus] = useState("");
   const [results, setResults] = useState([]);
-  const [deleting, setDeleting] = useState(false); // NEW: loading state
+  const [deleting, setDeleting] = useState(false); 
 
   useEffect(() => {
     fetchResults();

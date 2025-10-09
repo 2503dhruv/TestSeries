@@ -20,6 +20,7 @@ app.use('/api', testRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/results', resultRoutes);
 
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Backend API is running 🚀');

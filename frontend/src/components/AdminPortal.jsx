@@ -10,7 +10,19 @@ const AdminPanel = () => {
   const [error, setError] = useState(null);
   const [hasKey, setHasKey] = useState(!!sessionStorage.getItem("adminKey"));
   const [nav, setNav] = useState("dashboard");
-
+  const [results, setResults] = useState([]);
+  const [resultsLoading, setResultsLoading] = useState(true);
+  const [resultsError, setResultsError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState("");
+  const [sortKey, setSortKey] = useState(null);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedTests, setSelectedTests] = useState([]);
+  const [resultSearchTerm, setResultSearchTerm] = useState("");
+  const [selectedResults, setSelectedResults] = useState([]);
+  const [deletingResultId, setDeletingResultId] = useState(null);
+  const [resultSortKey, setResultSortKey] = useState(null);
+  const [resultSortOrder, setResultSortOrder] = useState("asc");
   // Fetch tests
   const fetchTests = async () => {
     setLoading(true);
@@ -36,6 +48,25 @@ const AdminPanel = () => {
     else setLoading(false);
   }, [hasKey]);
 
+  // Fetch results
+  const fetchResults = async () => {
+    setResultsLoading(true);
+    setResultsError(null);
+    try {
+      const { data } = await API.get("/admin/results");
+
+      setResults(data);
+    } catch (err) {
+      setResultsError("Failed to fetch results.");
+    } finally {
+      setResultsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (nav === "results" && hasKey) fetchResults();
+  }, [nav, hasKey]);
+
   // Delete a test
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this test?")) return;
@@ -43,12 +74,59 @@ const AdminPanel = () => {
       setDeletingId(id);
       await API.delete(`/admin/tests/${id}`);
       setTests((prev) => prev.filter((test) => test._id !== id));
+      setSelectedTests((prev) => prev.filter(selectedId => selectedId !== id));
     } catch (err) {
       setError("Failed to delete test.");
     } finally {
       setDeletingId(null);
     }
   };
+
+  // Bulk delete selected tests
+  const handleBulkDelete = async () => {
+    if (selectedTests.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedTests.length} tests?`)) return;
+    try {
+      for (const id of selectedTests) {
+        await API.delete(`/admin/tests/${id}`);
+      }
+      setTests(prev => prev.filter(test => !selectedTests.includes(test._id)));
+      setSelectedTests([]);
+    } catch (err) {
+      setError("Failed to delete selected tests.");
+    }
+  };
+
+  const handleDeleteResult = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this result?")) return;
+  try {
+    setDeletingResultId(true);
+    await API.delete("/admin/results/clear");
+    setResults([]);
+    // setResults(prev => prev.filter(res => res._id !== id));
+    // setSelectedResults(prev => prev.filter(selectedId => selectedId !== id));
+  } catch (err) {
+    setResultsError("Failed to delete result.");
+  } finally {
+    setDeletingResultId(null);
+  }
+};
+
+const handleBulkDeleteResults = async () => {
+  if (selectedResults.length === 0) return;
+  if (!window.confirm(`Are you sure you want to delete ${selectedResults.length} results?`)) return;
+  try {
+    // Ideally, you should send one API call for many deletions, but for now, loop
+    for (const id of selectedResults) {
+      await API.delete(`/admin/results/${id}`);
+    }
+    setResults(prev => prev.filter(res => !selectedResults.includes(res._id)));
+    setSelectedResults([]);
+  } catch (err) {
+    setResultsError("Failed to bulk delete results.");
+  }
+};
+
 
   // View test details
   const viewDetails = async (id) => {
@@ -60,6 +138,7 @@ const AdminPanel = () => {
     }
   };
 
+  // Modal close
   const closeModal = () => setViewingTest(null);
 
   // Admin key modal handler
@@ -76,6 +155,28 @@ const AdminPanel = () => {
   // For demo, completed tests = those with difficulty "Hard"
   const completedCount = tests.filter(t => t.difficulty === "Hard").length;
 
+  // Filter and sort tests
+  const filteredTests = tests
+    .filter(t =>
+      t.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (selectedDifficulty ? t.difficulty === selectedDifficulty : true)
+    )
+    .sort((a, b) => {
+      if (!sortKey) return 0;
+      let aVal = a[sortKey] || "";
+      let bVal = b[sortKey] || "";
+      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+  const filteredResults = results.filter(r =>
+  (r.studentName || "").toLowerCase().includes(resultSearchTerm.toLowerCase()) ||
+  (r.studentEmail || "").toLowerCase().includes(resultSearchTerm.toLowerCase()) ||
+  (r.testId?.section || "").toLowerCase().includes(resultSearchTerm.toLowerCase()) ||
+  (r.testId?.title || "").toLowerCase().includes(resultSearchTerm.toLowerCase())
+    );
+
+    
   return (
     <div className="new-admin-root">
       {!hasKey && (
@@ -94,7 +195,6 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
-
       <aside className="side-nav">
         <div className="side-logo">TechForTechie</div>
         <div className="side-section">Admin Access</div>
@@ -111,9 +211,14 @@ const AdminPanel = () => {
           >
             Tests
           </div>
+          <div
+            className={nav === "results" ? "side-link active" : "side-link"}
+            onClick={() => setNav("results")}
+          >
+            Results
+          </div>
         </nav>
       </aside>
-
       <main className={`new-admin-main ${!hasKey ? "blur-bg" : ""}`}>
         {nav === "dashboard" ? (
           <div className="dashboard-redesign">
@@ -168,18 +273,75 @@ const AdminPanel = () => {
               </div>
             </div>
           </div>
-        ) : (
+        ) : nav === "tests" ? (
           <div className="tests-view">
             <h1>Test Management</h1>
             {error && <div className="error-message">{error}</div>}
+            {/* Filters */}
+            <div className="filters-row">
+              <input
+                type="text"
+                placeholder="Search tests..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <select
+                value={selectedDifficulty}
+                onChange={e => setSelectedDifficulty(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All Difficulties</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+              <select
+                value={sortKey || ""}
+                onChange={e => {
+                  const key = e.target.value || null;
+                  if (key === sortKey) {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortKey(key);
+                    setSortOrder("asc");
+                  }
+                }}
+                className="sort-select"
+              >
+                <option value="">Sort By</option>
+                <option value="title">Title</option>
+                <option value="difficulty">Difficulty</option>
+                <option value="section">Section</option>
+              </select>
+            </div>
+            {/* Bulk Delete Button */}
+            {selectedTests.length > 0 && (
+              <button onClick={handleBulkDelete} className="delete-btn bulk-delete-btn">
+                Delete Selected ({selectedTests.length})
+              </button>
+            )}
             {loading ? (
               <div className="loading-message">Loading tests...</div>
-            ) : tests.length === 0 ? (
+            ) : filteredTests.length === 0 ? (
               <p>No tests available.</p>
             ) : (
               <table className="test-table">
                 <thead>
                   <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={selectedTests.length === filteredTests.length && filteredTests.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedTests(filteredTests.map(t => t._id));
+                          } else {
+                            setSelectedTests([]);
+                          }
+                        }}
+                      />
+                    </th>
                     <th>Title</th>
                     <th>Section</th>
                     <th>Difficulty</th>
@@ -187,8 +349,21 @@ const AdminPanel = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tests.map((test) => (
+                  {filteredTests.map((test) => (
                     <tr key={test._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedTests.includes(test._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedTests([...selectedTests, test._id]);
+                            } else {
+                              setSelectedTests(selectedTests.filter(id => id !== test._id));
+                            }
+                          }}
+                        />
+                      </td>
                       <td>{test.title}</td>
                       <td>{test.section || "-"}</td>
                       <td>{test.difficulty || "-"}</td>
@@ -213,12 +388,8 @@ const AdminPanel = () => {
               <div className="modal-overlay" onClick={closeModal}>
                 <div className="modal-content" onClick={e => e.stopPropagation()}>
                   <h2>{viewingTest.title}</h2>
-                  <p>
-                    <strong>Section:</strong> {viewingTest.section || "-"}
-                  </p>
-                  <p>
-                    <strong>Difficulty:</strong> {viewingTest.difficulty || "-"}
-                  </p>
+                  <p><strong>Section:</strong> {viewingTest.section || "-"}</p>
+                  <p><strong>Difficulty:</strong> {viewingTest.difficulty || "-"}</p>
                   <h3>Questions:</h3>
                   <ol>
                     {viewingTest.questions?.map((q, idx) => (
@@ -229,20 +400,102 @@ const AdminPanel = () => {
                             <li key={i}>{opt}</li>
                           ))}
                         </ul>
-                        <p>
-                          <strong>Answer:</strong> {q.correctAnswer}
-                        </p>
+                        <p><strong>Answer:</strong> {q.correctAnswer}</p>
                       </li>
                     ))}
                   </ol>
-                  <button className="close-btn" onClick={closeModal}>
-                    Close
-                  </button>
+                  <button className="close-btn" onClick={closeModal}>Close</button>
                 </div>
               </div>
             )}
           </div>
-        )}
+        ) : nav === "results" ? (
+        <div className="results-view">
+        <h1>Test Results</h1>
+  <div className="filters-row">
+    <input
+      type="text"
+      placeholder="Search results..."
+      value={resultSearchTerm}
+      onChange={e => setResultSearchTerm(e.target.value)}
+      className="search-input"
+    />
+    {selectedResults.length > 0 && (
+      <button className="delete-btn bulk-delete-btn" onClick={handleBulkDeleteResults}>
+        Delete Selected ({selectedResults.length})
+      </button>
+    )}
+  </div>
+  {resultsError && <div className="error-message">{resultsError}</div>}
+  {resultsLoading ? (
+    <div>Loading results...</div>
+  ) : filteredResults.length === 0 ? (
+    <div>No results to display.</div>
+  ) : (
+    <table className="test-table">
+      <thead>
+        <tr>
+          <th>
+            <input
+              type="checkbox"
+              checked={selectedResults.length === filteredResults.length && filteredResults.length > 0}
+              onChange={e => {
+                if (e.target.checked) {
+                  setSelectedResults(filteredResults.map(r => r._id));
+                } else {
+                  setSelectedResults([]);
+                }
+              }}
+            />
+          </th>
+          <th>Student Name</th>
+          <th>Email</th>
+          <th>Section</th>
+          <th>Test Title</th>
+          <th>Score</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredResults.map((result) => (
+          <tr key={result._id}>
+            <td>
+              <input
+                type="checkbox"
+                checked={selectedResults.includes(result._id)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedResults([...selectedResults, result._id]);
+                  } else {
+                    setSelectedResults(selectedResults.filter(id => id !== result._id));
+                  }
+                }}
+              />
+            </td>
+            <td data-label="Student Name">{result.studentName}</td>
+            <td data-label="Email">{result.studentEmail}</td>
+            <td data-label="Section">{result.testId?.section || "N/A"}</td>
+            <td data-label="Test Title">{result.testId?.title || "Unknown Test"}</td>
+            <td data-label="Score">{result.score}/{result.totalQuestions}</td>
+            <td data-label="Date">{new Date(result.timestamp).toLocaleDateString()}</td>
+            {/* <td>
+              <button
+                className="delete-btn"
+                onClick={() => handleDeleteResult(result._id)}
+                disabled={deletingResultId === result._id}
+              >
+                {deletingResultId === result._id ? "Deleting..." : "Delete"}
+              </button>
+            </td> */}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+        </div>
+
+        ) : null}
       </main>
     </div>
   );
