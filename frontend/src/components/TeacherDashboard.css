@@ -1,158 +1,237 @@
-/* TeacherDashboard.css */
+/* TeacherDashboard.css - Modern Violet Theme */
 
-.TeacherDashboard {
-  max-width: 1100px;
-  margin: 40px auto;
+.teacher-dashboard-container {
+  min-height: 100vh;
   padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #2c3e50;
+  background: #f7f9fc; /* Soft background */
 }
 
-.TeacherDashboard h1 {
+.teacher-dashboard-card {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    border: 1px solid #f0f0f0;
+}
+
+.teacher-dashboard-card h1 {
   text-align: center;
-  font-size: 2.3rem;
-  margin-bottom: 20px;
-  color: #1e293b;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #5b21b6;
 }
 
-.TeacherDashboard h2 {
+.upload-header, .results-title {
   margin-top: 30px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   font-size: 1.6rem;
-  color: #34495e;
-  border-left: 4px solid #3498db;
-  padding-left: 10px;
+  color: #1e293b;
+  border-left: 5px solid #a78bfa; /* Soft Violet accent bar */
+  padding-left: 15px;
+  font-weight: 700;
 }
 
 /* Upload Form */
-.TeacherDashboard form {
+.upload-form {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;
-  background: #f8fafc;
+  background: #fcfcfc;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eee;
 }
 
-.TeacherDashboard input[type="text"],
-.TeacherDashboard select,
-.TeacherDashboard input[type="file"] {
-  flex: 1 1 220px;
-  padding: 10px 12px;
+.form-input,
+.form-select {
+  flex: 1 1 200px;
+  padding: 12px 15px;
   font-size: 0.95rem;
-  border: 1px solid #ccc;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
   outline: none;
-  transition: border 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.TeacherDashboard input[type="text"]:focus,
-.TeacherDashboard select:focus,
-.TeacherDashboard input[type="file"]:focus {
-  border-color: #3498db;
+.form-input:focus,
+.form-select:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
 }
 
-.TeacherDashboard button {
-  padding: 10px 18px;
-  background: #3498db;
+.file-input {
+    flex: 1 1 200px;
+    padding: 10px;
+    cursor: pointer;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+.file-input::file-selector-button {
+    background: #ede9fe; /* Light Violet */
+    color: #5b21b6;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    margin-right: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.file-input::file-selector-button:hover {
+    background: #ddd6fe;
+}
+
+
+.upload-btn {
+  padding: 12px 25px;
+  background: #8b5cf6;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+  flex-shrink: 0;
 }
 
-.TeacherDashboard button:hover {
-  background: #2980b9;
+.upload-btn:hover {
+  background: #7c3aed;
   transform: translateY(-1px);
 }
 
-.TeacherDashboard button:active {
-  transform: scale(0.97);
+.upload-btn:active {
+  transform: scale(0.99);
 }
 
-.TeacherDashboard p {
+.upload-status, .no-results-message {
   margin-top: 10px;
   font-size: 0.95rem;
-  color: #555;
+  color: #475569;
+  text-align: center;
+}
+
+.divider {
+    border: 0;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 30px 0;
 }
 
 /* Results Table */
-.TeacherDashboard table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
-.TeacherDashboard thead {
-  background: #1e293b;
+.results-table-container {
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table thead {
+  background: #5b21b6; /* Deep Violet Header */
   color: white;
 }
 
-.TeacherDashboard th,
-.TeacherDashboard td {
-  padding: 12px 14px;
+.results-table th,
+.results-table td {
+  padding: 15px 14px;
   text-align: center;
   font-size: 0.95rem;
 }
 
-.TeacherDashboard tbody tr {
+.results-table tbody tr {
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s;
 }
 
-.TeacherDashboard tbody tr:hover {
-  background: #f9fafb;
+.results-table tbody tr:hover {
+  background: #fcfcfc;
 }
 
-.TeacherDashboard td {
-  color: #444;
+.score-cell {
+  font-weight: 700;
+  color: #10b981; /* Green for score */
 }
 
-.TeacherDashboard td:nth-child(5) {
-  font-weight: bold;
-  color: #2c5282;
+.clear-results-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
 }
 
-/* Responsive Design */
+.clear-results-btn:hover {
+  background-color: #dc2626;
+}
+
+.clear-results-btn:disabled {
+  background-color: #fca5a5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+
+/* Responsive Design (keeping existing logic) */
 @media (max-width: 768px) {
-  .TeacherDashboard form {
+  .upload-form {
     flex-direction: column;
   }
+  .upload-btn {
+      width: 100%;
+  }
 
-  .TeacherDashboard thead {
+  .results-table thead {
     display: none;
   }
 
-  .TeacherDashboard table,
-  .TeacherDashboard tbody,
-  .TeacherDashboard tr,
-  .TeacherDashboard td {
+  .results-table,
+  .results-table tbody,
+  .results-table tr,
+  .results-table td {
     display: block;
     width: 100%;
   }
 
-  .TeacherDashboard tr {
+  .results-table tr {
     margin-bottom: 15px;
     background: #fff;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    padding: 12px;
+    padding: 15px 12px;
   }
 
-  .TeacherDashboard td {
+  .results-table td {
     text-align: right;
     padding: 8px 12px;
     position: relative;
   }
 
-  .TeacherDashboard td::before {
+  .results-table td::before {
     content: attr(data-label);
     position: absolute;
     left: 12px;
@@ -160,29 +239,3 @@
     color: #555;
   }
 }
-.results-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.clear-results-btn {
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 5px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.clear-results-btn:hover {
-  background-color: #ff7875;
-}
-
-.clear-results-btn:disabled {
-  background-color: #ffa6a6;
-  cursor: not-allowed;
-}
-
