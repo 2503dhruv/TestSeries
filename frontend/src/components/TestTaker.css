@@ -1,110 +1,211 @@
-/* TestTaker.css */
+/* TestTaker.css - Modern Violet Theme */
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #f0f2f5;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f7f9fc; /* Soft background */
   color: #333;
-  line-height: 1.6;
 }
 
-.TestTaker {
-  max-width: 800px;
-  margin: 20px auto;
+.test-taker-main {
+  max-width: 900px;
+  margin: 40px auto;
   padding: 20px;
+}
+
+.info-card, .test-card, .results-card {
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 20px; /* Large radius */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  padding: 40px;
+  border: 1px solid #f0f0f0;
 }
 
-.TestTaker h1 {
+.info-card h1, .results-card h1, .test-title {
   text-align: center;
-  color: #1a237e;
+  color: #5b21b6;
   margin-bottom: 25px;
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+.test-title {
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
 }
 
-.TestTaker form {
+/* Info Form (Start Screen) */
+.info-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.TestTaker .info-form input[type="text"],
-.TestTaker .info-form input[type="email"] {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
-}
-
-.TestTaker .info-form label {
+.form-group label {
   font-weight: 600;
-  color: #424242;
+  color: #475569;
+  display: block;
+  margin-bottom: 5px;
 }
 
-.TestTaker .question-container {
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 20px;
+.info-form input[type="text"],
+.info-form input[type="email"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px; 
+  box-sizing: border-box;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.info-form input:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.3);
+  outline: none;
+}
+
+.terms-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+.terms-checkbox-group input {
+    width: auto;
+    height: 18px;
+}
+.terms-checkbox-group label {
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 0;
+}
+
+.start-btn, .submit-btn {
+  background-color: #8b5cf6;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 25px;
+  font-size: 1.1em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  margin-top: 10px;
+}
+
+.start-btn:hover, .submit-btn:hover {
+  background-color: #7c3aed;
+  transform: translateY(-2px);
+}
+.start-btn:disabled, .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Question Section */
+.question-container {
+  background: #fcfcfc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+}
+
+.question-text {
+  color: #1e293b;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 0;
   margin-bottom: 20px;
 }
 
-.TestTaker h3 {
-  color: #333;
-  margin-top: 0;
-  margin-bottom: 15px;
+.options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.TestTaker label {
-  display: block;
-  margin-bottom: 10px;
+/* Selectable Card Options (Expensely Style) */
+.option-label {
+  display: flex;
+  align-items: center;
   cursor: pointer;
-  padding: 10px;
+  padding: 15px;
   background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  transition: background-color 0.2s;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s;
+  font-weight: 500;
 }
 
-.TestTaker label:hover {
-  background-color: #f0f0f0;
+.option-label:hover {
+  border-color: #d1d5db;
+  background-color: #f7f9fc;
 }
 
-.TestTaker input[type="radio"] {
-  margin-right: 10px;
+/* Selected Option State */
+.option-label.selected {
+  background-color: #ede9fe; /* Light Violet background */
+  border-color: #8b5cf6; /* Strong Violet border */
+  box-shadow: 0 0 0 2px #c4b5fd; /* Soft ring around selection */
+  color: #5b21b6;
+  font-weight: 700;
 }
 
-.TestTaker button[type="submit"] {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 15px 25px;
-  font-size: 1.1em;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  align-self: flex-end;
+.option-radio {
+  margin-right: 15px;
+  /* Hide native radio button but allow it to be selected */
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #a78bfa;
+  border-radius: 50%;
+  transition: background-color 0.2s, border-color 0.2s;
+  position: relative;
+  flex-shrink: 0;
+}
+.option-radio:checked {
+    background-color: #8b5cf6;
+    border-color: #8b5cf6;
+}
+.option-radio:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
 }
 
-.TestTaker button[type="submit"]:hover {
-  background-color: #0056b3;
+.submit-btn {
+    align-self: flex-end;
 }
 
-.TestTaker .results-display {
-  text-align: center;
-  margin-top: 50px;
+/* Results Display */
+.results-card {
+    border-top: 5px solid #10b981;
+}
+.results-card h1 {
+    color: #10b981; /* Green success color */
+}
+.score-value {
+    color: #5b21b6;
+    font-size: 1.8em;
+    font-weight: 900;
+}
+.results-subtext {
+    color: #475569;
+    margin-top: 15px;
 }
 
-.TestTaker .results-display p {
-  font-size: 1.5em;
-  font-weight: 600;
-  color: #28a745;
-}
-
-.TestTaker .loading {
-  text-align: center;
-  font-style: italic;
-  color: #6c757d;
+/* Loading State */
+.loading-message {
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
 }

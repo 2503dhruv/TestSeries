@@ -1,106 +1,113 @@
-/* StudentPortal.css */
+/* StudentPortal.css - Modern Violet Theme for Tables */
 
 .student-portal {
-  max-width: 1000px;
-  margin: 40px auto;
+  max-width: 1100px;
+  margin: 60px auto;
   padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  font-family: 'Inter', sans-serif;
+  color: #1e293b;
 }
 
 .student-portal h1 {
   text-align: center;
-  font-size: 2rem;
-  margin-bottom: 25px;
-  color: #2c3e50;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 35px;
+  color: #5b21b6; /* Deep Violet */
 }
 
 /* Loading & No tests */
 .loading-message,
-.student-portal p {
+.no-tests-message {
   text-align: center;
-  font-size: 1.1rem;
-  color: #666;
+  font-size: 1.15rem;
+  color: #475569;
+  padding: 50px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 /* Table Styling */
+.tests-list-container {
+    background: white;
+    border-radius: 16px; /* Large radius for modern feel */
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Prominent, soft shadow */
+    border: 1px solid #f0f0f0;
+}
+
 .tests-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .tests-table thead {
-  background: #2c3e50;
+  background: #5b21b6; /* Deep Violet Header */
   color: #fff;
 }
 
 .tests-table th,
 .tests-table td {
-  padding: 14px 16px;
+  padding: 18px 16px;
   text-align: center;
   font-size: 0.95rem;
 }
 
 .tests-table tbody tr {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e5e7eb;
   transition: background 0.2s ease-in-out;
 }
 
 .tests-table tbody tr:hover {
-  background: #f8f9fa;
+  background: #fcfcfc; /* Subtle hover effect */
 }
 
 /* Difficulty badges */
 .difficulty {
   display: inline-block;
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 7px 14px;
+  border-radius: 25px;
   font-weight: 600;
   font-size: 0.85rem;
   text-transform: capitalize;
 }
 
 .difficulty.easy {
-  background: #d4edda;
-  color: #155724;
+  background: #dcfce7; /* Light Green */
+  color: #166534; /* Dark Green */
 }
 
 .difficulty.medium {
-  background: #fff3cd;
-  color: #856404;
+  background: #fef9c3; /* Light Yellow */
+  color: #92400e; /* Dark Brown/Orange */
 }
 
 .difficulty.hard {
-  background: #f8d7da;
-  color: #721c24;
+  background: #fecaca; /* Light Red */
+  color: #991b1b; /* Dark Red */
 }
 
 /* Start Test Button */
 .start-test-btn {
-  background: #3498db;
+  background: #8b5cf6; /* Medium Violet */
   color: white;
   border: none;
-  padding: 10px 18px;
-  font-size: 0.9rem;
+  padding: 10px 20px;
+  font-size: 0.95rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
 }
 
 .start-test-btn:hover {
-  background: #2980b9;
+  background: #7c3aed; /* Darker Violet on hover */
   transform: translateY(-1px);
 }
 
-.start-test-btn:active {
-  transform: scale(0.97);
-}
-
-/* Responsive Design */
+/* Responsive Design (keeping existing logic) */
 @media (max-width: 768px) {
   .tests-table thead {
     display: none;
@@ -117,9 +124,9 @@
   .tests-table tr {
     margin-bottom: 15px;
     background: #fff;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    padding: 12px;
+    padding: 15px 12px;
   }
 
   .tests-table td {

@@ -3,39 +3,39 @@ import "./Footer.css";
 
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="app-footer">
       <div className="footer-container">
-        {/* Logo / Brand */}
-        <div className="footer-brand">
-          <h2>TechForTechie</h2>
-          <p>Empowering learners with technology-driven tests & resources.</p>
+        {/* Logo / Brand - UPDATED */}
+        <div className="footer-brand-section">
+          <h2>Assessify</h2>
+          <p>The unified platform for streamlined academic automation and assessment.</p>
         </div>
 
         {/* Quick Links */}
-        <div className="footer-links">
+        <div className="footer-links-group">
           <h3>Quick Links</h3>
           <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/student">Tests</a></li>
-            <li><a href="/about">About</a></li>
-            <li><a href="/contact">Contact</a></li>
+            <li><a href="/" className="footer-link">Home</a></li>
+            <li><a href="/student" className="footer-link">Student Portal</a></li>
+            <li><a href="/teacher" className="footer-link">Faculty Portal</a></li>
+            <li><a href="/quizes" className="footer-link">Learning Resources</a></li>
           </ul>
         </div>
 
         {/* Social Media */}
-        <div className="footer-social">
+        <div className="footer-social-group">
           <h3>Follow Us</h3>
-          <div className="social-icons">
-            <a href="https://twitter.com" target="_blank" rel="noreferrer">🐦</a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer">💼</a>
-            <a href="https://github.com" target="_blank" rel="noreferrer">💻</a>
+          <div className="social-icons-list">
+            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon">🐦</a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-icon">💼</a>
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="social-icon">💻</a>
           </div>
         </div>
       </div>
 
       {/* Bottom Section */}
-      <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} TechForTechie. All rights reserved.</p>
+      <div className="footer-bottom-bar">
+        <p>© {new Date().getFullYear()} Assessify. All rights reserved.</p>
       </div>
     </footer>
   );

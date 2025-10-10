@@ -1,31 +1,33 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../../logo.svg'; // CORRECTED PATH: Trying one more level up to resolve compilation
 import './Navbar.css';
-import logo from './logo (1).png';
-
 
 const Navbar = () => {
   return (
     <nav className="navbar">
-      <div className="navbar-logo">
-        <Link to="/"><img src={logo} alt="Site Logo" style={{ width: "40px", height: "auto" }} /></Link>
+      <div className="navbar-logo-group">
+        <Link to="/" className="navbar-brand-link">
+          <img 
+            src={logo} 
+            alt="Assessify Logo" 
+            className="navbar-logo-img" 
+          />
+          <span className="navbar-brand-text">
+            Assessify
+          </span>
+        </Link>
       </div>
       <ul className="navbar-links">
         <li>
-          <Link to="/">Home</Link>
+            <Link to="/" className="nav-link">Home</Link>
         </li>
         <li>
-          <Link to="/quizes">Courses</Link>
+          <Link to="/quizes" className="nav-link">Learning Resources</Link>
         </li>
         <li>
-          <Link to="/teacher">Teacher Dashboard</Link>
+          <Link to="/teacher" className="nav-link">Faculty Dashboard</Link>
         </li>
-        <li>
-          <Link to="/quizes">Support</Link>
-        </li>
-        {/* <li>
-          <Link to="/admin">Admin Panel</Link>
-        </li> */}
       </ul>
     </nav>
   );
