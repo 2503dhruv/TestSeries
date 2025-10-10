@@ -32,7 +32,7 @@ export default function Home() {
             The unified platform for streamlined academic automation, intelligent assessment, and efficient learning management.
           </p>
           <Link to="/student">
-            <button className="cta-btn">Access Your Portal</button>
+            <button className="cta-btn">Begin Your Assessment Journey</button>
           </Link>
         </div>
       </section>
@@ -54,7 +54,7 @@ export default function Home() {
       {/* Process/How it Works Section - Visual timeline feel */}
       <section id="process" className="section alt-bg">
         <h3>Our Core Functions</h3>
-        <div className="process-grid">
+        <div className="card-grid">
             <div className="process-step">
                 <div className="step-icon-wrapper"><FileText className="step-icon" /></div>
                 <h4 className="step-title">1. Faculty Uploads</h4>
@@ -79,7 +79,7 @@ export default function Home() {
       </section>
       
       {/* NEW SECTION: Integration & Compliance */}
-      <section id="compliance" className="section integration-section">
+      {/* <section id="compliance" className="section integration-section">
           <h3>Built for the Ecosystem: Integration & Security</h3>
           <p className="section-subtext">
               Assessify meets institutional security needs and is designed for seamless integration with existing Learning Management Systems (LMS).
@@ -91,16 +91,16 @@ export default function Home() {
                       <span>{item.title}</span>
                   </div>
               ))}
-          </div>
+          </div> */}
           {/* Placeholder for LMS Logos */}
-          <div className="lms-logo-grid">
-              {/* Note: In a real app, use image URLs for logos */}
+          {/* <div className="lms-logo-grid">
+
               <img src="https://placehold.co/100x40/dddddd/475569?text=LMS%20Canvas" alt="LMS Placeholder 1" />
               <img src="https://placehold.co/100x40/dddddd/475569?text=LMS%20Moodle" alt="LMS Placeholder 2" />
               <img src="https://placehold.co/100x40/dddddd/475569?text=LMS%20Blackboard" alt="LMS Placeholder 3" />
               <img src="https://placehold.co/100x40/dddddd/475569?text=LMS%20Custom" alt="LMS Placeholder 4" />
           </div>
-      </section>
+      </section> */}
 
       {/* Contact Section */}
       <section id="contact" className="section contact-section">

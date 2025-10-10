@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import API from "../api";
 import "./TeacherDashboard.css";
+// Importing Lucide icons for a modern UI look
+import { Upload, Download, Trash2, Gauge, Users, ListChecks, Eye, FileText, BarChart3, CloudUpload, Loader2 } from "lucide-react"; 
 
 const TeacherDashboard = () => {
   const [file, setFile] = useState(null);
@@ -10,19 +12,56 @@ const TeacherDashboard = () => {
   const [uploadStatus, setUploadStatus] = useState("");
   const [results, setResults] = useState([]);
   const [deleting, setDeleting] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // --- Placeholder Data for New Sections ---
+  const [currentTests, setCurrentTests] = useState([
+    { _id: 't1', title: 'Data Structures Midterm', section: 'C++', difficulty: 'Hard', status: 'Draft' }, 
+    { _id: 't2', title: 'Python Essentials Quiz', section: 'Python', difficulty: 'Easy', status: 'Draft' },
+    { _id: 't3', title: 'JavaScript Final Exam', section: 'JavaScript', difficulty: 'Medium', status: 'Draft' }, 
+    { _id: 't4', title: 'Networking Basics', section: 'Misc', difficulty: 'Medium', status: 'Draft' },
+  ]);
+  
+  const [performanceStats, setPerformanceStats] = useState({
+    totalSubmissions: 0,
+    averageScore: 'N/A',
+    // Calculate initial active tests count from placeholder data
+    activeTests: currentTests.filter(t => t.status === 'Published').length, 
+  });
+  // --- End Placeholder Data ---
+
+  // NOTE: Wrapped in useCallback to satisfy the useEffect dependency rule (React Hook Warning Fix)
+  const fetchResults = useCallback(async () => {
+    try {
+      // Calculate the active tests count based on the current state array (Fixing the active count bug)
+      setPerformanceStats(prev => {
+        const liveCount = currentTests.filter(t => t.status === 'Published').length;
+        return {
+          ...prev,
+          activeTests: liveCount,
+        };
+      });
+
+      const { data } = await API.get("/results");
+      setResults(data);
+      
+      const avgScore = data.length > 0 ? (data.reduce((sum, res) => sum + res.score, 0) / data.length / (data[0]?.totalQuestions || 1) * 100).toFixed(0) + '%' : 'N/A';
+      
+      setPerformanceStats(prev => ({
+        ...prev,
+        totalSubmissions: data.length,
+        averageScore: avgScore,
+      }));
+    } catch (error) {
+      console.error("Failed to fetch results:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentTests]); // currentTests is added as dependency
 
   useEffect(() => {
     fetchResults();
-  }, []);
-
-  const fetchResults = async () => {
-    try {
-      const { data } = await API.get("/results");
-      setResults(data);
-    } catch (error) {
-      console.error("Failed to fetch results:", error);
-    }
-  };
+  }, [fetchResults]); 
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -49,9 +88,7 @@ const TeacherDashboard = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log("Uploaded Test:", data.test);
-
-      setUploadStatus("Upload successful! Test is now available.");
+      setUploadStatus("Upload successful! Test is now available as DRAFT.");
       setTestTitle("");
       setTestSection("");
       setTestDifficulty("Easy");
@@ -59,6 +96,17 @@ const TeacherDashboard = () => {
       document.getElementById("file-upload").value = "";
 
       fetchResults();
+      
+      // Add new test to currentTests list (prepending to show immediately)
+      const newTest = { 
+          _id: data.test._id || Date.now(), 
+          title: data.test.title, 
+          section: data.test.section, 
+          difficulty: data.test.difficulty, 
+          status: 'Draft' 
+      };
+      setCurrentTests(prev => [newTest, ...prev]);
+
     } catch (error) {
       setUploadStatus("Error: " + (error.response?.data?.error || error.message));
       console.error("Upload failed:", error);
@@ -67,10 +115,9 @@ const TeacherDashboard = () => {
 
   const clearResults = async () => {
     if (!window.confirm("Are you sure you want to delete all results? This action cannot be undone.")) return;
-
     try {
       setDeleting(true);
-      await API.delete("/results/clear");
+      await API.delete("/results/clear"); 
       setResults([]);
       alert("All results have been deleted!");
     } catch (error) {
@@ -80,110 +127,262 @@ const TeacherDashboard = () => {
       setDeleting(false);
     }
   };
+  
+  const handleDownloadReport = () => {
+    alert("Generating and downloading class performance report...");
+  };
+  
+  const handleDeleteTest = (id) => {
+    if (!window.confirm("Are you sure you want to delete this test?")) return;
+    // Simulate API call to delete test
+    setCurrentTests(prev => prev.filter(test => test._id !== id));
+    fetchResults(); // Recalculate stats
+  };
+
+  // FUNCTIONAL CHANGE: Status is toggled by clicking the eye icon
+  const handleToggleStatus = (id) => {
+      // 1. Update the currentTests array
+      setCurrentTests(prev => prev.map(test => 
+        test._id === id ? { ...test, status: test.status === 'Published' ? 'Draft' : 'Published' } : test
+      ));
+      
+      // 2. Update the activeTests count in the stats immediately
+      setPerformanceStats(prev => ({
+        ...prev,
+        activeTests: prev.activeTests + (currentTests.find(t => t._id === id)?.status === 'Draft' ? 1 : -1)
+      }));
+  };
+  
+  // NOTE: This handles the click on the Eye/View button, which we are using for the toggle function
+  const handleViewDetails = (id, status) => {
+    // For simplicity, clicking the Eye icon triggers the Publish/Draft toggle
+    handleToggleStatus(id);
+    // In a production app, you would also open a modal here to view/edit test details.
+    // if (status === 'Published') { // open edit modal } else { // open draft details }
+  };
+
+  // Helper component for Stat Cards
+  const StatCard = ({ icon: Icon, value, label }) => (
+    <div className="stat-card">
+      <div className="stat-icon-wrap">
+        <Icon className="stat-icon" />
+      </div>
+      <div>
+        <div className="stat-value">{value}</div>
+        <div className="stat-label">{label}</div>
+      </div>
+    </div>
+  );
+
+
+  if (loading) return <div className="teacher-dashboard-container loading-container"><Loader2 size={36} className="animate-spin text-indigo-600" /><div className="loading-message">Loading dashboard...</div></div>;
 
   return (
     <div className="teacher-dashboard-container">
       <div className="teacher-dashboard-card">
-        <h1>Faculty Dashboard</h1>
+        
+        <h1 className="main-title">Faculty Dashboard</h1>
 
-        {/* Upload Section */}
-        <h2 className="upload-header">Upload New Assessment (CSV/Excel)</h2>
+        {/* 1. Performance Snapshot Section (Analytics) */}
+        <h2 className="results-title">
+          <BarChart3 className="icon-left" size={24} /> Performance Snapshot
+        </h2>
+        <div className="performance-stats-grid">
+          <StatCard 
+            icon={Users} 
+            value={performanceStats.totalSubmissions} 
+            label="Total Submissions Recorded" 
+          />
+          <StatCard 
+            icon={Gauge} 
+            value={performanceStats.averageScore} 
+            label="Overall Class Average" 
+          />
+          <StatCard 
+            icon={ListChecks} 
+            value={performanceStats.activeTests} 
+            label="Assessments Live" 
+          />
+        </div>
+
+        {/* Divider */}
+        <hr className="divider" />
+
+        {/* 2. Manage Assessments Section */}
+        <h2 className="manage-header">
+            <FileText className="icon-left" size={24} /> Manage Existing Assessments
+        </h2>
+        
+        <div className="test-management-list">
+            {currentTests.length === 0 ? (
+                <p className="no-tests-message">No tests uploaded yet. Use the section below to upload a CSV file.</p>
+            ) : (
+                currentTests.map(test => (
+                    <div key={test._id} className={`test-item-card status-${test.status.toLowerCase()}`}>
+                        <div className="test-meta">
+                            <span className="test-title">{test.title}</span>
+                            <span className="test-section-tag">{test.section} ({test.difficulty})</span>
+                        </div>
+                        <div className="test-actions">
+                            
+                            {/* STATUS BADGE - VISUAL ONLY */}
+                            <span className={`status-badge badge-${test.status.toLowerCase()}`}>
+                                {test.status}
+                            </span>
+                            
+                            {/* EYE ICON: Functions as the Publish/Draft Toggle and visually indicates status */}
+                            <button 
+                                className={`publish-view-btn icon-action-btn status-icon-btn status-${test.status.toLowerCase()}`} 
+                                onClick={() => handleViewDetails(test._id, test.status)} 
+                                title={test.status === 'Published' ? 'Set to Draft (Hide)' : 'Publish Test (Show)'}
+                            >
+                                <Eye size={20} />
+                            </button>
+                            
+                            {/* DELETE BUTTON (Trash) */}
+                            <button className="delete-btn icon-action-btn" onClick={() => handleDeleteTest(test._id)} title="Delete Test">
+                                <Trash2 size={20} />
+                            </button>
+                        </div>
+                    </div>
+                ))
+            )}
+        </div>
+
+
+        {/* Divider */}
+        <hr className="divider" />
+
+        {/* 3. Upload New Assessment Section */}
+        <h2 className="upload-header">
+          <CloudUpload className="icon-left" size={24} /> Bulk Upload Assessment (CSV/Excel)
+        </h2>
+        
         <form onSubmit={handleUpload} className="upload-form">
-          <input
-            type="text"
-            placeholder="Test Title (e.g., Data Structures Final)"
-            value={testTitle}
-            onChange={(e) => setTestTitle(e.target.value)}
-            required
-            className="form-input"
-          />
-          
-          <select
-            value={testSection}
-            onChange={(e) => setTestSection(e.target.value)}
-            required
-            className="form-select"
-          >
-            <option value="">--Select a Course/Section--</option>
-            <option value="C++">C++</option>
-            <option value="Java">Java</option>
-            <option value="Python">Python</option>
-            <option value="JavaScript">JavaScript</option>
-            <option value="React">React</option>
-            <option value="SQL">SQL</option>
-          </select>
+            {/* Group 1: Metadata Inputs */}
+            <div className="form-metadata-group">
+                <input
+                    type="text"
+                    placeholder="Assessment Title"
+                    value={testTitle}
+                    onChange={(e) => setTestTitle(e.target.value)}
+                    required
+                    className="form-input"
+                />
+                
+                <select
+                    value={testSection}
+                    onChange={(e) => setTestSection(e.target.value)}
+                    required
+                    className="form-select"
+                >
+                    <option value="">-- Select Course/Section --</option>
+                    <option value="C++">C++</option>
+                    <option value="Java">Java</option>
+                    <option value="Python">Python</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="React">React</option>
+                    <option value="SQL">SQL</option>
+                </select>
 
-          <select
-            value={testDifficulty}
-            onChange={(e) => setTestDifficulty(e.target.value)}
-            required
-            className="form-select"
-          >
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-          </select>
-
-          <input
-            type="file"
-            id="file-upload"
-            onChange={handleFileChange}
-            accept=".csv, .xlsx"
-            required
-            className="file-input"
-          />
-          <button type="submit" className="upload-btn">Upload Test</button>
+                <select
+                    value={testDifficulty}
+                    onChange={(e) => setTestDifficulty(e.target.value)}
+                    required
+                    className="form-select"
+                >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            
+            {/* Group 2: File Upload and Button */}
+            <div className="form-file-group">
+                <input
+                    type="file"
+                    id="file-upload"
+                    onChange={(e) => setFile(e.target.files[0])}
+                    accept=".csv, .xlsx"
+                    required
+                    className="file-input"
+                />
+                <button type="submit" className="upload-btn">
+                    <Upload size={20} className="icon-right" />
+                    Upload Test
+                </button>
+            </div>
         </form>
         <p className="upload-status">{uploadStatus}</p>
 
+        {/* Divider */}
         <hr className="divider" />
 
-        {/* Results Section */}
+        {/* 4. Test Results Section */}
         <div className="results-header">
-          <h2 className="results-title">Test Results & Performance Analytics</h2>
-          {results.length > 0 && (
-            <button
-              className="clear-results-btn"
-              onClick={clearResults}
-              disabled={deleting}
-            >
-              {deleting ? "Deleting..." : "✖ Clear All Results"}
-            </button>
-          )}
+            <h2 className="results-title">
+                <BarChart3 className="icon-left" size={24} /> Student Results & Performance Analytics
+            </h2>
+            <div className="results-actions">
+                {results.length > 0 && (
+                    <button
+                        className="download-btn"
+                        onClick={handleDownloadReport}
+                    >
+                        <Download size={20} className="icon-left" /> Download Report (CSV)
+                    </button>
+                )}
+                {results.length > 0 && (
+                    <button
+                        className="clear-results-btn"
+                        onClick={clearResults}
+                        disabled={deleting}
+                    >
+                        <Trash2 size={20} className="icon-left" /> 
+                        {deleting ? "Deleting..." : "Clear All Results"}
+                    </button>
+                )}
+            </div>
         </div>
 
-        {results.length === 0 ? (
-          <p className="no-results-message">No student test results to display yet.</p>
-        ) : (
-          <div className="results-table-container">
-            <table className="results-table">
-              <thead>
-                <tr>
-                  <th>Student Name</th>
-                  <th>Student Email</th>
-                  <th>Course/Section</th>
-                  <th>Assessment Title</th>
-                  <th>Score</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((result) => (
-                  <tr key={result._id}>
-                    <td data-label="Student Name">{result.studentName}</td>
-                    <td data-label="Student Email">{result.studentEmail}</td>
-                    <td data-label="Course/Section">{result.testId?.section || "N/A"}</td>
-                    <td data-label="Assessment Title">{result.testId?.title || "Unknown Test"}</td>
-                    <td data-label="Score" className="score-cell">
-                      {result.score}/{result.totalQuestions}
-                    </td>
-                    <td data-label="Date">{new Date(result.timestamp).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="results-table-container">
+            {results.length === 0 ? (
+                <p className="no-results-message">No student test results to display yet.</p>
+            ) : (
+                <table className="results-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Student Email</th>
+                            <th>Course/Section</th>
+                            <th>Assessment Title</th>
+                            <th>Score</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {results.map((result) => (
+                            <tr key={result._id}>
+                                <td>{result.studentName}</td>
+                                <td>{result.studentEmail}</td>
+                                <td>{result.testId?.section || "N/A"}</td>
+                                <td>{result.testId?.title || "Unknown Test"}</td>
+                                <td className="score-cell">
+                                    {result.score}/{result.totalQuestions}
+                                </td>
+                                <td>{new Date(result.timestamp).toLocaleDateString()}</td>
+                                <td>
+                                    <button className="view-submission-btn">
+                                        <Eye size={18} /> View
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </div>
       </div>
     </div>
   );
