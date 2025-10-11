@@ -11,6 +11,9 @@ body {
   margin: 40px auto;
   padding: 20px;
 }
+.test-taker-main:fullscreen {
+  overflow-y: auto;
+}
 
 .info-card, .test-card, .results-card {
   background-color: #fff;
@@ -208,4 +211,41 @@ body {
     text-align: center;
     font-style: italic;
     color: #6c757d;
+}
+.fullscreen-warning {
+  background-color: #fff3cd; /* light yellow */
+  border: 1px solid #ffeeba; /* yellow border */
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  color: #856404; /* dark yellow/brown */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fullscreen-warning p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.fullscreen-warning button {
+  background-color: #856404; /* brown */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.fullscreen-warning button:hover {
+  background-color: #6b4d02; /* darker brown */
+}
+
+/* Optional: Add some spacing above the quiz card */
+.test-card {
+  margin-top: 10px;
 }

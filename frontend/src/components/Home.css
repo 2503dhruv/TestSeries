@@ -97,11 +97,7 @@
 .alt-bg {
     background: #ffffff;
 }
-.contact-section {
-    background: #f3e8ff; /* Very light purple tint */
-    /* --- MODIFIED: Adjust padding for width and height --- */
-    padding: 60px 40px; /* Decreased vertical padding (60px), Increased horizontal padding (40px) */
-}
+
 .integration-section {
     background: #ffffff; /* White background for visibility of logos */
 }
@@ -324,4 +320,53 @@
     .process-grid {
         grid-template-columns: 1fr;
     }
+}
+.section.contact-section {
+  width: 140%;
+  background: transparent;
+  color: #1f2937;
+  text-align: center;
+  padding: 40px 20px;
+  
+  border-bottom: 1px solid #e5e7eb;
+  margin-top: 60px;
+}
+
+.section.contact-section h3 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.section-subtext {
+  font-size: 1rem;
+  max-width: 700px;
+  margin: 0 auto 20px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* ✉️ Contact Button */
+.contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 12px 22px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.contact-btn .btn-icon {
+  font-size: 1.1rem;
+}
+
+.contact-btn:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
 }

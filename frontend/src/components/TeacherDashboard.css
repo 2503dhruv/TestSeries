@@ -441,3 +441,20 @@
         grid-template-columns: 1fr;
     }
 }
+.download-sample-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #6d28d9;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid #d1d5db;
+  transition: background 0.2s ease;
+}
+
+.download-sample-btn:hover {
+  background-color: #e5e7eb;
+}

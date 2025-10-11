@@ -195,59 +195,24 @@ const TeacherDashboard = () => {
           />
           <StatCard 
             icon={Gauge} 
-            value={performanceStats.averageScore} 
+            value={performanceStats.averageScore}
             label="Overall Class Average" 
           />
-          <StatCard 
+          {/* <StatCard 
             icon={ListChecks} 
             value={performanceStats.activeTests} 
             label="Assessments Live" 
-          />
+          /> */}
         </div>
 
         {/* Divider */}
         <hr className="divider" />
 
         {/* 2. Manage Assessments Section */}
-        <h2 className="manage-header">
+        {/* <h2 className="manage-header">
             <FileText className="icon-left" size={24} /> Manage Existing Assessments
-        </h2>
+        </h2> */}
         
-        <div className="test-management-list">
-            {currentTests.length === 0 ? (
-                <p className="no-tests-message">No tests uploaded yet. Use the section below to upload a CSV file.</p>
-            ) : (
-                currentTests.map(test => (
-                    <div key={test._id} className={`test-item-card status-${test.status.toLowerCase()}`}>
-                        <div className="test-meta">
-                            <span className="test-title">{test.title}</span>
-                            <span className="test-section-tag">{test.section} ({test.difficulty})</span>
-                        </div>
-                        <div className="test-actions">
-                            
-                            {/* STATUS BADGE - VISUAL ONLY */}
-                            <span className={`status-badge badge-${test.status.toLowerCase()}`}>
-                                {test.status}
-                            </span>
-                            
-                            {/* EYE ICON: Functions as the Publish/Draft Toggle and visually indicates status */}
-                            <button 
-                                className={`publish-view-btn icon-action-btn status-icon-btn status-${test.status.toLowerCase()}`} 
-                                onClick={() => handleViewDetails(test._id, test.status)} 
-                                title={test.status === 'Published' ? 'Set to Draft (Hide)' : 'Publish Test (Show)'}
-                            >
-                                <Eye size={20} />
-                            </button>
-                            
-                            {/* DELETE BUTTON (Trash) */}
-                            <button className="delete-btn icon-action-btn" onClick={() => handleDeleteTest(test._id)} title="Delete Test">
-                                <Trash2 size={20} />
-                            </button>
-                        </div>
-                    </div>
-                ))
-            )}
-        </div>
 
 
         {/* Divider */}
@@ -297,7 +262,7 @@ const TeacherDashboard = () => {
                 </select>
             </div>
             
-            {/* Group 2: File Upload and Button */}
+            
             <div className="form-file-group">
                 <input
                     type="file"
@@ -307,6 +272,9 @@ const TeacherDashboard = () => {
                     required
                     className="file-input"
                 />
+                  <a href="/sample_assessment_template.xlsx" download className="download-sample-btn" title="Download sample Excel template to see the required format">
+                                <Download size={18} className="icon-left" /> Sample File
+                  </a>
                 <button type="submit" className="upload-btn">
                     <Upload size={20} className="icon-right" />
                     Upload Test
@@ -324,14 +292,14 @@ const TeacherDashboard = () => {
                 <BarChart3 className="icon-left" size={24} /> Student Results & Performance Analytics
             </h2>
             <div className="results-actions">
-                {results.length > 0 && (
-                    <button
-                        className="download-btn"
-                        onClick={handleDownloadReport}
-                    >
-                        <Download size={20} className="icon-left" /> Download Report (CSV)
-                    </button>
-                )}
+                  {/* {results.length > 0 && (
+                      <button
+                          className="download-btn"
+                          onClick={handleDownloadReport}
+                      >
+                          <Download size={20} className="icon-left" /> Download Report (CSV)
+                      </button>
+                  )} */}
                 {results.length > 0 && (
                     <button
                         className="clear-results-btn"

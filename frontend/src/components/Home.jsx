@@ -1,10 +1,11 @@
+import React from "react";
 import { Users, Laptop, Mail, GraduationCap, FileText, BarChart3, Clock, CheckCircle, Shield, Code } from "lucide-react"; 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
-
 import "./Home.css"; 
 
 export default function Home() {
+  const navigate = useNavigate();
 
   const featureList = [
     { icon: FileText, title: "Assignment Management", description: "Faculty can create, distribute, and evaluate assignments efficiently in a structured digital workflow." },
@@ -21,7 +22,7 @@ export default function Home() {
 
   return (
     <div className="home-container">
-      
+
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-text">
@@ -77,7 +78,7 @@ export default function Home() {
             </div>
         </div>
       </section>
-      
+
       {/* NEW SECTION: Integration & Compliance */}
       {/* <section id="compliance" className="section integration-section">
           <h3>Built for the Ecosystem: Integration & Security</h3>
@@ -108,7 +109,7 @@ export default function Home() {
         <p className="section-subtext">
           Ready to integrate Assessify into your academic ecosystem? Reach out to our dedicated support for a seamless transition.
         </p>
-        <button className="contact-btn">
+        <button className="contact-btn" onClick={() => navigate("/About")}>
           <Mail className="btn-icon" /> Request Demo or Support
         </button>
       </section>

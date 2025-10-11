@@ -1,10 +1,9 @@
-/* StudentPortal.css - Modern Violet Theme for Tables */
-
+/* ---------- Overall Layout ---------- */
 .student-portal {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 60px auto;
   padding: 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: #1e293b;
 }
 
@@ -13,10 +12,10 @@
   font-size: 2.2rem;
   font-weight: 800;
   margin-bottom: 35px;
-  color: #5b21b6; /* Deep Violet */
+  color: #5b21b6;
 }
 
-/* Loading & No tests */
+/* ---------- Loading & Empty States ---------- */
 .loading-message,
 .no-tests-message {
   text-align: center;
@@ -28,73 +27,94 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
-/* Table Styling */
-.tests-list-container {
-    background: white;
-    border-radius: 16px; /* Large radius for modern feel */
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Prominent, soft shadow */
-    border: 1px solid #f0f0f0;
+/* ---------- Tests Grid ---------- */
+.tests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
-.tests-table {
-  width: 100%;
-  border-collapse: collapse;
+/* ---------- Individual Test Card ---------- */
+.test-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+  border: 1px solid #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.tests-table thead {
-  background: #5b21b6; /* Deep Violet Header */
-  color: #fff;
+.test-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(91, 33, 182, 0.15);
 }
 
-.tests-table th,
-.tests-table td {
-  padding: 18px 16px;
-  text-align: center;
-  font-size: 0.95rem;
+/* ---------- Card Header ---------- */
+.test-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
 }
 
-.tests-table tbody tr {
-  border-bottom: 1px solid #e5e7eb;
-  transition: background 0.2s ease-in-out;
+.test-card-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  flex: 1;
+  margin-right: 10px;
+  line-height: 1.3;
 }
 
-.tests-table tbody tr:hover {
-  background: #fcfcfc; /* Subtle hover effect */
-}
-
-/* Difficulty badges */
+/* Difficulty Badge */
 .difficulty {
   display: inline-block;
-  padding: 7px 14px;
-  border-radius: 25px;
+  padding: 6px 12px;
+  border-radius: 20px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   text-transform: capitalize;
+  white-space: nowrap;
 }
 
 .difficulty.easy {
-  background: #dcfce7; /* Light Green */
-  color: #166534; /* Dark Green */
+  background: #dcfce7;
+  color: #166534;
 }
 
 .difficulty.medium {
-  background: #fef9c3; /* Light Yellow */
-  color: #92400e; /* Dark Brown/Orange */
+  background: #fef9c3;
+  color: #92400e;
 }
 
 .difficulty.hard {
-  background: #fecaca; /* Light Red */
-  color: #991b1b; /* Dark Red */
+  background: #fecaca;
+  color: #991b1b;
 }
 
-/* Start Test Button */
+/* ---------- Card Body ---------- */
+.test-card-body p {
+  font-size: 0.9rem;
+  color: #475569;
+  margin: 8px 0;
+}
+
+/* ---------- Card Footer ---------- */
+.test-card-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .start-test-btn {
-  background: #8b5cf6; /* Medium Violet */
+  background: #8b5cf6;
   color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 0.95rem;
+  padding: 10px 16px;
+  font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -103,43 +123,18 @@
 }
 
 .start-test-btn:hover {
-  background: #7c3aed; /* Darker Violet on hover */
+  background: #7c3aed;
   transform: translateY(-1px);
 }
 
-/* Responsive Design (keeping existing logic) */
-@media (max-width: 768px) {
-  .tests-table thead {
-    display: none;
+/* ---------- Responsive ---------- */
+@media (max-width: 500px) {
+  .test-card-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  .tests-table,
-  .tests-table tbody,
-  .tests-table tr,
-  .tests-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .tests-table tr {
-    margin-bottom: 15px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    padding: 15px 12px;
-  }
-
-  .tests-table td {
-    text-align: right;
-    padding: 8px 12px;
-    position: relative;
-  }
-
-  .tests-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 12px;
-    font-weight: 600;
-    color: #555;
+  .difficulty {
+    margin-top: 8px;
   }
 }

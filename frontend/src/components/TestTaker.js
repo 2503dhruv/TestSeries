@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
 import API from "../api";
+import { useParams, useNavigate } from "react-router-dom";
 import "./TestTaker.css";
 
 const TestTaker = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [studentName, setStudentName] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
+  const [termsChecked, setTermsChecked] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [test, setTest] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -14,7 +17,44 @@ const TestTaker = () => {
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Fetch test after acceptance
+  const [fullscreenExits, setFullscreenExits] = useState(0);
+  const [fullscreenLost, setFullscreenLost] = useState(false);
+  const testContainerRef = useRef(null);
+
+  // Detect fullscreen changes
+  useEffect(() => {
+    if (!accepted) return;
+
+    function handleFullscreenChange() {
+      if (!document.fullscreenElement) {
+        setFullscreenLost(true);
+        setFullscreenExits((prev) => prev + 1);
+      } else {
+        setFullscreenLost(false);
+      }
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, [accepted]);
+
+  // Alerts on fullscreen exit counts, ends session on two exits
+  useEffect(() => {
+    if (!accepted) return;
+
+    if (fullscreenExits === 1) {
+      alert(
+        "Please stay in fullscreen mode during your assessment. If you exit fullscreen again, your test may be ended."
+      );
+    } else if (fullscreenExits >= 2) {
+      alert("You have exited fullscreen mode twice. Your session will now end.");
+      window.location.reload();
+    }
+  }, [fullscreenExits, accepted]);
+
+  // Fetch test on acceptance
   useEffect(() => {
     const fetchTest = async () => {
       setLoading(true);
@@ -30,28 +70,33 @@ const TestTaker = () => {
     if (accepted) fetchTest();
   }, [id, accepted]);
 
-  // Handle option change
+  // Track answers
   const handleAnswerChange = (questionId, selectedOption) => {
-    const qId = questionId.toString(); // convert ObjectId to string
+    const qId = questionId.toString();
     setAnswers((prev) => ({
       ...prev,
       [qId]: selectedOption,
     }));
   };
 
-  // Submit test
+  // Start assessment and enter fullscreen
+  const handleStartAssessment = (e) => {
+    e.preventDefault();
+    if (!studentName || !studentEmail || !termsChecked) return;
+
+    if (testContainerRef.current && testContainerRef.current.requestFullscreen) {
+      testContainerRef.current.requestFullscreen();
+    }
+    setAccepted(true);
+  };
+
+  // Submit answers
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (Object.keys(answers).length !== test.questions.length) {
-      if (
-        !window.confirm(
-          "Some questions are unanswered. Do you still want to submit?"
-        )
-      )
+      if (!window.confirm("Some questions are unanswered. Do you still want to submit?"))
         return;
     }
-
     try {
       const { data } = await API.post(`/submit/${id}`, {
         studentName,
@@ -66,20 +111,14 @@ const TestTaker = () => {
     }
   };
 
-  // Render: Start Form (Login/Info)
+  // BEFORE start: Login/Info form
   if (!accepted) {
+    const isFormIncomplete = !studentName || !studentEmail;
     return (
-      <div className="test-taker-main">
+      <div className="test-taker-main" ref={testContainerRef}>
         <div className="info-card">
           <h1>Assessment Information</h1>
-          <form
-            className="info-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              // Note: Accepted checkbox must be checked to proceed, handled by required attribute
-              if (studentName && studentEmail) setAccepted(true); 
-            }}
-          >
+          <form className="info-form" onSubmit={handleStartAssessment}>
             <div className="form-group">
               <label>Full Name:</label>
               <input
@@ -98,22 +137,25 @@ const TestTaker = () => {
                 required
               />
             </div>
-            
             <div className="terms-checkbox-group">
               <input
                 type="checkbox"
-                onChange={(e) => setAccepted(e.target.checked)}
-                required
                 id="terms-checkbox"
+                disabled={isFormIncomplete}
+                checked={termsChecked}
+                onChange={(e) => setTermsChecked(e.target.checked)}
+                required={!isFormIncomplete}
               />
-              <label htmlFor="terms-checkbox">
+              <label
+                htmlFor="terms-checkbox"
+                style={isFormIncomplete ? { color: "#aaa", cursor: "not-allowed" } : {}}
+              >
                 I accept the terms and conditions.
               </label>
             </div>
-            
             <button
               type="submit"
-              disabled={!studentName || !studentEmail || !accepted}
+              disabled={isFormIncomplete || !termsChecked}
               className="start-btn"
             >
               Start Assessment
@@ -124,10 +166,15 @@ const TestTaker = () => {
     );
   }
 
-  // Render: Loading state
-  if (loading) return <div className="test-taker-main loading-message">Loading assessment questions...</div>;
+  // Loading screen
+  if (loading)
+    return (
+      <div className="test-taker-main loading-message">
+        Loading assessment questions...
+      </div>
+    );
 
-  // Render: Results
+  // Results screen with Home button
   if (showResults) {
     return (
       <div className="test-taker-main results-card">
@@ -136,39 +183,64 @@ const TestTaker = () => {
           Your Final Score: <span className="score-value">{score}</span> / {test.questions.length}
         </p>
         <p className="results-subtext">Your results have been recorded and sent to the faculty.</p>
+        <button className="home-btn" onClick={() => navigate("/")}>
+          Home
+        </button>
       </div>
     );
   }
 
-  // Render: Test questions
+  // MAIN test with overlay and disabled inputs while fullscreen lost
   return (
-    <div className="test-taker-main">
+    <div className="test-taker-main" ref={testContainerRef} style={{ position: "relative" }}>
+      {fullscreenLost && (
+        <>
+          <div className="fullscreen-warning">
+            <p>You have exited fullscreen mode.</p>
+            <button
+              onClick={() => {
+                if (testContainerRef.current && testContainerRef.current.requestFullscreen) {
+                  testContainerRef.current.requestFullscreen();
+                }
+              }}
+              className="reenter-fullscreen-btn"
+            >
+              Re-enter Fullscreen
+            </button>
+          </div>
+          <div className="fullscreen-blocker" />
+        </>
+      )}
+
       <div className="test-card">
         <h1 className="test-title">{test?.title}</h1>
         <form onSubmit={handleSubmit} className="questions-form">
           {test?.questions.map((q, index) => {
             const qId = q._id.toString();
             const selectedOption = answers[qId];
-            
             return (
               <div key={qId} className="question-container">
                 <h3 className="question-text">
                   {index + 1}. {q.question}
                 </h3>
                 <div className="options-group">
-                {q.options.map((option, i) => (
-                  <label key={i} className={`option-label ${selectedOption === option ? 'selected' : ''}`}>
-                    <input
-                      type="radio"
-                      name={`question-${qId}`}
-                      value={option}
-                      checked={selectedOption === option}
-                      onChange={() => handleAnswerChange(qId, option)}
-                      className="option-radio"
-                    />
-                    {option}
-                  </label>
-                ))}
+                  {q.options.map((option, i) => (
+                    <label
+                      key={i}
+                      className={`option-label ${selectedOption === option ? "selected" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name={`question-${qId}`}
+                        value={option}
+                        checked={selectedOption === option}
+                        disabled={fullscreenLost}
+                        onChange={() => handleAnswerChange(qId, option)}
+                        className="option-radio"
+                      />
+                      {option}
+                    </label>
+                  ))}
                 </div>
               </div>
             );
@@ -176,7 +248,7 @@ const TestTaker = () => {
 
           <button
             type="submit"
-            disabled={Object.keys(answers).length === 0}
+            disabled={fullscreenLost || Object.keys(answers).length === 0}
             className="submit-btn"
           >
             Submit Assessment

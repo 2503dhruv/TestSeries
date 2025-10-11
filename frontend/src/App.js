@@ -7,6 +7,7 @@ import AdminPanel from './components/AdminPortal.jsx';
 import PublicLayout from './components/layouts/PublicLayout';
 import AdminLayout from './components/layouts/adminlayout.js';
 import Quizes from './components/Quizes';
+import About from './components/About';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,6 +22,7 @@ function App() {
                     <Route path="/test/:id" element={<TestTaker />} />
                     <Route path="/teacher" element={<TeacherDashboard />} />
                     <Route path="/quizes" element={<Quizes />} />
+                    <Route path="/about" element={<About />} />
                 </Route>
 
                 

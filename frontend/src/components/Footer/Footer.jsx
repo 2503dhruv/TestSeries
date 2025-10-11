@@ -1,14 +1,18 @@
 import React from "react";
+import { FaTwitter, FaLinkedinIn, FaGithub } from "react-icons/fa";
 import "./Footer.css";
 
 const Footer = () => {
   return (
     <footer className="app-footer">
       <div className="footer-container">
-        {/* Logo / Brand - UPDATED */}
+        {/* Logo / Brand */}
         <div className="footer-brand-section">
           <h2>Assessify</h2>
-          <p>The unified platform for streamlined academic automation and assessment.</p>
+          <p>
+            The unified platform for streamlined academic automation and
+            assessment.
+          </p>
         </div>
 
         {/* Quick Links */}
@@ -26,14 +30,19 @@ const Footer = () => {
         <div className="footer-social-group">
           <h3>Follow Us</h3>
           <div className="social-icons-list">
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon">🐦</a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-icon">💼</a>
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="social-icon">💻</a>
+            <a href="https://twitter.com" target="_blank" rel="noreferrer" className="social-icon">
+              <FaTwitter />
+            </a>
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="social-icon">
+              <FaLinkedinIn />
+            </a>
+            <a href="https://github.com" target="_blank" rel="noreferrer" className="social-icon">
+              <FaGithub />
+            </a>
           </div>
         </div>
       </div>
 
-      {/* Bottom Section */}
       <div className="footer-bottom-bar">
         <p>© {new Date().getFullYear()} Assessify. All rights reserved.</p>
       </div>
