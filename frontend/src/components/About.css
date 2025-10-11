@@ -27,7 +27,7 @@
   align-items: center;
 }
 .contact-card .contact-icon {
-  color: #70bb36;
+  color: #8b5cf6;
   font-size: 50px;
   margin-bottom: 26px;
   width: 52px; height: 52px;
@@ -46,7 +46,7 @@
 
 .about-mapbox {
   max-width: 100%;
-  border: 3px solid #94b535;
+  border: 3px solid #8b5cf6;
   border-radius: 8px;
   overflow: hidden;
   margin: 0 auto 45px auto;
@@ -128,14 +128,14 @@
 
 .about-form input:focus,
 .about-form textarea:focus {
-  box-shadow: 0 0 0 2px #76b331;
+  box-shadow: 0 0 0 2px #8b5cf6;
 }
 
 /* Button */
 .about-submit-btn {
   margin-top: 6px;
   padding: 13px 0;
-  background: #76b331;
+  background: #8b5cf6;
   color: #fff;
   border: none;
   font-weight: 600;
@@ -146,7 +146,7 @@
 }
 
 .about-submit-btn:hover {
-  background: #5e9b27;
+  background: #76b331;
 }
 
 .form-status {

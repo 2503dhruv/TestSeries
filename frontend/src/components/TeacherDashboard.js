@@ -206,7 +206,7 @@ const TeacherDashboard = () => {
         </div>
 
         {/* Divider */}
-        <hr className="divider" />
+       
 
         {/* 2. Manage Assessments Section */}
         {/* <h2 className="manage-header">
