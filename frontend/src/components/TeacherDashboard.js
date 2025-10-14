@@ -2,17 +2,23 @@ import React, { useState, useEffect, useCallback } from "react";
 import API from "../api";
 import "./TeacherDashboard.css";
 // Importing Lucide icons for a modern UI look
-import { Upload, Download, Trash2, Gauge, Users, ListChecks, Eye, FileText, BarChart3, CloudUpload, Loader2 } from "lucide-react"; 
+import { Upload, Download, Trash2, Gauge, Users, ListChecks, Eye, FileText, BarChart3, CloudUpload, Loader2, Plus, Minus } from "lucide-react";
 
 const TeacherDashboard = () => {
   const [file, setFile] = useState(null);
   const [testTitle, setTestTitle] = useState("");
-  const [testSection, setTestSection] = useState(""); 
-  const [testDifficulty, setTestDifficulty] = useState("Easy"); 
+  const [testSection, setTestSection] = useState("");
+  const [testDifficulty, setTestDifficulty] = useState("Easy");
   const [uploadStatus, setUploadStatus] = useState("");
   const [results, setResults] = useState([]);
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Course creation states
+  const [courseTitle, setCourseTitle] = useState("");
+  const [courseDescription, setCourseDescription] = useState("");
+  const [lessons, setLessons] = useState([{ title: "", content: "" }]);
+  const [courseUploadStatus, setCourseUploadStatus] = useState("");
 
   // --- Placeholder Data for New Sections ---
   const [currentTests, setCurrentTests] = useState([
@@ -161,6 +167,51 @@ const TeacherDashboard = () => {
     // if (status === 'Published') { // open edit modal } else { // open draft details }
   };
 
+  // Course creation handlers
+  const handleAddLesson = () => {
+    setLessons([...lessons, { title: "", content: "" }]);
+  };
+
+  const handleRemoveLesson = (index) => {
+    if (lessons.length > 1) {
+      setLessons(lessons.filter((_, i) => i !== index));
+    }
+  };
+
+  const handleLessonChange = (index, field, value) => {
+    const updatedLessons = lessons.map((l, i) =>
+      i === index ? { ...l, [field]: value } : l
+    );
+    setLessons(updatedLessons);
+  };
+
+  const handleCreateCourse = async (e) => {
+    e.preventDefault();
+
+    if (!courseTitle || lessons.some(l => !l.title || !l.content)) {
+      setCourseUploadStatus("Please fill in all fields for title and all lessons.");
+      return;
+    }
+
+    setCourseUploadStatus("Creating course...");
+
+    try {
+      const { data } = await API.post("/upload-course", {
+        title: courseTitle,
+        description: courseDescription,
+        lessons,
+      });
+
+      setCourseUploadStatus("Course created successfully!");
+      setCourseTitle("");
+      setCourseDescription("");
+      setLessons([{ title: "", content: "" }]);
+    } catch (error) {
+      setCourseUploadStatus("Error: " + (error.response?.data?.message || error.message));
+      console.error("Course creation failed:", error);
+    }
+  };
+
   // Helper component for Stat Cards
   const StatCard = ({ icon: Icon, value, label }) => (
     <div className="stat-card">
@@ -286,7 +337,81 @@ const TeacherDashboard = () => {
         {/* Divider */}
         <hr className="divider" />
 
-        {/* 4. Test Results Section */}
+        {/* 4. Create Course Section */}
+        <h2 className="upload-header">
+          <FileText className="icon-left" size={24} /> Create Learning Course
+        </h2>
+
+        <form onSubmit={handleCreateCourse} className="upload-form">
+          {/* Course Metadata */}
+          <div className="form-metadata-group">
+            <input
+              type="text"
+              placeholder="Course Title (e.g., DSA)"
+              value={courseTitle}
+              onChange={(e) => setCourseTitle(e.target.value)}
+              required
+              className="form-input"
+            />
+
+            <textarea
+              placeholder="Course Description (optional)"
+              value={courseDescription}
+              onChange={(e) => setCourseDescription(e.target.value)}
+              className="form-textarea"
+            />
+          </div>
+
+          {/* Lessons Section */}
+          <div className="questions-section">
+            <h3>Lessons</h3>
+            {lessons.map((l, index) => (
+              <div key={index} className="question-item">
+                <div className="question-header">
+                  <span>Lesson {index + 1}</span>
+                  {lessons.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveLesson(index)}
+                      className="remove-btn"
+                    >
+                      <Minus size={16} />
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Lesson Title"
+                  value={l.title}
+                  onChange={(e) => handleLessonChange(index, "title", e.target.value)}
+                  required
+                  className="lesson-title-input"
+                />
+                <textarea
+                  placeholder="Lesson Content"
+                  value={l.content}
+                  onChange={(e) => handleLessonChange(index, "content", e.target.value)}
+                  required
+                  className="lesson-content-textarea"
+                />
+              </div>
+            ))}
+            <button type="button" onClick={handleAddLesson} className="add-question-btn">
+              <Plus size={16} className="icon-left" /> Add Another Lesson
+            </button>
+          </div>
+
+          <button type="submit" className="upload-btn">
+            <Upload size={20} className="icon-right" />
+            Create Course
+          </button>
+        </form>
+        <p className="upload-status">{courseUploadStatus}</p>
+
+        {/* Divider */}
+        <hr className="divider" />
+
+        {/* 5. Test Results Section */}
         <div className="results-header">
             <h2 className="results-title">
                 <BarChart3 className="icon-left" size={24} /> Student Results & Performance Analytics

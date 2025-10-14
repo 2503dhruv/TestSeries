@@ -322,12 +322,11 @@
     }
 }
 .section.contact-section {
-  width: 140%;
+  width: 100%;
   background: transparent;
   color: #1f2937;
   text-align: center;
   padding: 40px 20px;
-  
   border-bottom: 1px solid #e5e7eb;
   margin-top: 60px;
 }

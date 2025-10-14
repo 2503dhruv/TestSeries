@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./AdminPortal.css";
 import API from "../api";
+import { FileText } from "lucide-react";
 
 const AdminPanel = () => {
   const [tests, setTests] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
   const [viewingTest, setViewingTest] = useState(null);
+  const [viewingCourse, setViewingCourse] = useState(null);
   const [error, setError] = useState(null);
   const [hasKey, setHasKey] = useState(!!sessionStorage.getItem("adminKey"));
   const [nav, setNav] = useState("dashboard");
@@ -23,6 +26,9 @@ const AdminPanel = () => {
   const [deletingResultId, setDeletingResultId] = useState(null);
   const [resultSortKey, setResultSortKey] = useState(null);
   const [resultSortOrder, setResultSortOrder] = useState("asc");
+  const [courseSearchTerm, setCourseSearchTerm] = useState("");
+  const [selectedCourses, setSelectedCourses] = useState([]);
+  const [deletingCourseId, setDeletingCourseId] = useState(null);
   // Fetch tests
   const fetchTests = async () => {
     setLoading(true);
@@ -44,8 +50,10 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
-    if (hasKey) fetchTests();
-    else setLoading(false);
+    if (hasKey) {
+      fetchTests();
+      fetchCourses();
+    } else setLoading(false);
   }, [hasKey]);
 
   // Fetch results
@@ -65,6 +73,20 @@ const AdminPanel = () => {
 
   useEffect(() => {
     if (nav === "results" && hasKey) fetchResults();
+  }, [nav, hasKey]);
+
+  // Fetch courses
+  const fetchCourses = async () => {
+    try {
+      const { data } = await API.get("/admin/courses");
+      setCourses(data);
+    } catch (err) {
+      console.error("Failed to fetch courses:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (nav === "courses" && hasKey) fetchCourses();
   }, [nav, hasKey]);
 
   // Delete a test
@@ -127,6 +149,36 @@ const handleBulkDeleteResults = async () => {
   }
 };
 
+// Delete a course
+const handleDeleteCourse = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this course?")) return;
+  try {
+    setDeletingCourseId(id);
+    await API.delete(`/admin/courses/${id}`);
+    setCourses((prev) => prev.filter((course) => course._id !== id));
+    setSelectedCourses((prev) => prev.filter(selectedId => selectedId !== id));
+  } catch (err) {
+    setError("Failed to delete course.");
+  } finally {
+    setDeletingCourseId(null);
+  }
+};
+
+// Bulk delete selected courses
+const handleBulkDeleteCourses = async () => {
+  if (selectedCourses.length === 0) return;
+  if (!window.confirm(`Are you sure you want to delete ${selectedCourses.length} courses?`)) return;
+  try {
+    for (const id of selectedCourses) {
+      await API.delete(`/admin/courses/${id}`);
+    }
+    setCourses(prev => prev.filter(course => !selectedCourses.includes(course._id)));
+    setSelectedCourses([]);
+  } catch (err) {
+    setError("Failed to delete selected courses.");
+  }
+};
+
 
   // View test details
   const viewDetails = async (id) => {
@@ -138,8 +190,21 @@ const handleBulkDeleteResults = async () => {
     }
   };
 
+  // View course details
+  const viewCourseDetails = async (id) => {
+    try {
+      const { data } = await API.get(`/courses/${id}`);
+      setViewingCourse(data);
+    } catch (err) {
+      setError("Failed to fetch course details.");
+    }
+  };
+
   // Modal close
-  const closeModal = () => setViewingTest(null);
+  const closeModal = () => {
+    setViewingTest(null);
+    setViewingCourse(null);
+  };
 
   // Admin key modal handler
   const handleKeySubmit = () => {
@@ -176,6 +241,17 @@ const handleBulkDeleteResults = async () => {
   (r.testId?.title || "").toLowerCase().includes(resultSearchTerm.toLowerCase())
     );
 
+  const filteredCourses = courses.filter(c =>
+    c.title.toLowerCase().includes(courseSearchTerm.toLowerCase())
+  ).sort((a, b) => {
+    if (!sortKey) return 0;
+    let aVal = a[sortKey] || "";
+    let bVal = b[sortKey] || "";
+    if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
     
   return (
     <div className="new-admin-root">
@@ -210,6 +286,12 @@ const handleBulkDeleteResults = async () => {
             onClick={() => setNav("tests")}
           >
             Tests
+          </div>
+          <div
+            className={nav === "courses" ? "side-link active" : "side-link"}
+            onClick={() => setNav("courses")}
+          >
+            Courses
           </div>
           <div
             className={nav === "results" ? "side-link active" : "side-link"}
@@ -401,6 +483,123 @@ const handleBulkDeleteResults = async () => {
                           ))}
                         </ul>
                         <p><strong>Answer:</strong> {q.correctAnswer}</p>
+                      </li>
+                    ))}
+                  </ol>
+                  <button className="close-btn" onClick={closeModal}>Close</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : nav === "courses" ? (
+          <div className="courses-view">
+            <h1>Course Management</h1>
+            {error && <div className="error-message">{error}</div>}
+            {/* Filters */}
+            <div className="filters-row">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={courseSearchTerm}
+                onChange={e => setCourseSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <select
+                value={sortKey || ""}
+                onChange={e => {
+                  const key = e.target.value || null;
+                  if (key === sortKey) {
+                    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortKey(key);
+                    setSortOrder("asc");
+                  }
+                }}
+                className="sort-select"
+              >
+                <option value="">Sort By</option>
+                <option value="title">Title</option>
+                <option value="description">Description</option>
+              </select>
+            </div>
+            {/* Bulk Delete Button */}
+            {selectedCourses.length > 0 && (
+              <button onClick={handleBulkDeleteCourses} className="delete-btn bulk-delete-btn">
+                Delete Selected ({selectedCourses.length})
+              </button>
+            )}
+            {loading ? (
+              <div className="loading-message">Loading courses...</div>
+            ) : filteredCourses.length === 0 ? (
+              <p>No courses available.</p>
+            ) : (
+              <table className="test-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={selectedCourses.length === filteredCourses.length && filteredCourses.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedCourses(filteredCourses.map(c => c._id));
+                          } else {
+                            setSelectedCourses([]);
+                          }
+                        }}
+                      />
+                    </th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCourses.map((course) => (
+                    <tr key={course._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedCourses.includes(course._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedCourses([...selectedCourses, course._id]);
+                            } else {
+                              setSelectedCourses(selectedCourses.filter(id => id !== course._id));
+                            }
+                          }}
+                        />
+                      </td>
+                      <td>{course.title}</td>
+                      <td>{course.description || "-"}</td>
+                      <td>
+                        <button className="view-btn" onClick={() => viewCourseDetails(course._id)}>
+                          View Details
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteCourse(course._id)}
+                          disabled={deletingCourseId === course._id}
+                        >
+                          {deletingCourseId === course._id ? "Deleting..." : "Delete"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {viewingCourse && (
+              <div className="modal-overlay" onClick={closeModal}>
+                <div className="modal-content" onClick={e => e.stopPropagation()}>
+                  <h2>{viewingCourse.title}</h2>
+                  <p><strong>Description:</strong> {viewingCourse.description || "-"}</p>
+                  <h3>Lessons:</h3>
+                  <ol>
+                    {viewingCourse.lessons?.map((lesson, idx) => (
+                      <li key={idx}>
+                        <p>{lesson.title}</p>
+                        <p>{lesson.content}</p>
                       </li>
                     ))}
                   </ol>

@@ -1,6 +1,6 @@
 /* Navbar.css - Softer, Clean Header */
 .navbar {
-  background-color: #f7f9fc; /* Very light background to soften pure white */
+  background-color: var(--navbar-bg, #f7f9fc); /* Very light background to soften pure white */
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -10,6 +10,13 @@
   top: 0;
   z-index: 10;
   font-family: 'Inter', sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .navbar-logo-group {
@@ -32,8 +39,9 @@
 .navbar-brand-text {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #5b21b6; /* Deep Violet for contrast */
+    color: var(--brand-color, #5b21b6); /* Deep Violet for contrast */
     letter-spacing: -0.5px;
+    transition: color 0.3s ease;
 }
 
 .navbar-links {
@@ -45,7 +53,7 @@
 }
 
 .nav-link {
-  color: #475569; /* Slate Gray for text */
+  color: var(--text-color, #475569); /* Slate Gray for text */
   text-decoration: none;
   font-size: 1.05rem;
   font-weight: 600;
@@ -55,8 +63,28 @@
 }
 
 .nav-link:hover {
-  color: #a78bfa; /* Light Violet Highlight on hover */
-  border-bottom: 3px solid #a78bfa;
+  color: var(--hover-color, #a78bfa); /* Light Violet Highlight on hover */
+  border-bottom: 3px solid var(--hover-color, #a78bfa);
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.theme-toggle:hover {
+  background-color: var(--hover-bg, rgba(167, 139, 250, 0.1));
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {
@@ -64,9 +92,12 @@
         padding: 0.75rem 1rem;
     }
     .navbar-links {
-        display: none; 
+        display: none;
     }
     .navbar-brand-text {
         font-size: 1.25rem;
+    }
+    .navbar-right {
+      gap: 1rem;
     }
 }

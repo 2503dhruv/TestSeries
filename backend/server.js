@@ -4,6 +4,7 @@ import cors from 'cors';
 import testRoutes from './routes/testRoutes.js';
 import adminRoutes from "./routes/adminRoutes.js";
 import resultRoutes from "./routes/resultRoutes.js";
+import courseRoutes from "./routes/courseRoutes.js";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(urlencoded({ extended: true }));
 app.use('/api', testRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/results', resultRoutes);
+app.use('/api', courseRoutes);
 
 
 // Root endpoint

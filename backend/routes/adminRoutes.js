@@ -1,6 +1,7 @@
 import { Router } from "express";
 import Test from "../models/Test.js";
 import Result from "../models/Result.js";
+import Course from "../models/Course.js";
 import adminAuth from "../middleware/adminauth.js";
 
 const router = Router();
@@ -45,6 +46,28 @@ router.get("/results/:testId", adminAuth, async (req, res) => {
       return res.status(404).json({ message: "No results found for this test." });
     }
     res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.get("/courses", adminAuth, async (req, res) => {
+  try {
+    const courses = await Course.find({}, "title description lessons");
+    res.json(courses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.delete("/courses/:id", adminAuth, async (req, res) => {
+  try {
+    const course = await Course.findByIdAndDelete(req.params.id);
+    if (!course) return res.status(404).json({ message: "Course not found" });
+
+    res.json({ message: "Course deleted successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server error");

@@ -4,6 +4,7 @@ import StudentPortal from './components/StudentPortal';
 import TestTaker from './components/TestTaker';
 import TeacherDashboard from './components/TeacherDashboard';
 import AdminPanel from './components/AdminPortal.jsx';
+import CourseViewer from './components/CourseViewer';
 import PublicLayout from './components/layouts/PublicLayout';
 import AdminLayout from './components/layouts/adminlayout.js';
 import Quizes from './components/Quizes';
@@ -20,6 +21,7 @@ function App() {
                     <Route path="/" element={<HomeDashboard />} />
                     <Route path="/Student" element={<StudentPortal />} />
                     <Route path="/test/:id" element={<TestTaker />} />
+                    <Route path="/course/:id" element={<CourseViewer />} />
                     <Route path="/teacher" element={<TeacherDashboard />} />
                     <Route path="/quizes" element={<Quizes />} />
                     <Route path="/about" element={<About />} />

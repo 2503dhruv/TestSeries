@@ -4,8 +4,8 @@
 /node_modules
 /.pnp
 .pnp.js
-
 /backend/node_modules
+
 # testing
 /coverage
 
@@ -18,9 +18,14 @@
 .env.development.local
 .env.test.local
 .env.production.local
-# ...existing code...
+
+# backend env
 /backend/.env
 
+# logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# do not share this file
+TODO.md
