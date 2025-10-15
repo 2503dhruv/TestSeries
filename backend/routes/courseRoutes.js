@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createCourse, getCourses, getCourseById } from '../controllers/courseController.js';
+import { createCourse, getCourses, getCourseById, deleteCourse, updateCourse } from '../controllers/courseController.js';
 
 const router = Router();
 
@@ -11,5 +11,11 @@ router.get('/courses', getCourses);
 
 // Get course by ID
 router.get('/courses/:id', getCourseById);
+
+// Delete course by ID
+router.delete('/courses/:id', deleteCourse);
+
+// Update course by ID
+router.patch('/courses/:id', updateCourse);
 
 export default router;

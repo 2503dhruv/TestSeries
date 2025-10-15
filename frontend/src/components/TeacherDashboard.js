@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import API from "../api";
 import "./TeacherDashboard.css";
 // Importing Lucide icons for a modern UI look
-import { Upload, Download, Trash2, Gauge, Users, ListChecks, Eye, FileText, BarChart3, CloudUpload, Loader2, Plus, Minus } from "lucide-react";
+import { Upload, Download, Trash2, Gauge, Users, ListChecks, Eye, FileText, BarChart3, CloudUpload, Loader2, Plus, Minus, Check, X } from "lucide-react";
 
 const TeacherDashboard = () => {
   const [file, setFile] = useState(null);
@@ -20,6 +20,12 @@ const TeacherDashboard = () => {
   const [lessons, setLessons] = useState([{ title: "", content: "" }]);
   const [courseUploadStatus, setCourseUploadStatus] = useState("");
 
+  // Courses management states
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [editingVisibility, setEditingVisibility] = useState(null);
+  const [tempVisibility, setTempVisibility] = useState({});
+
   // --- Placeholder Data for New Sections ---
   const [currentTests, setCurrentTests] = useState([
     { _id: 't1', title: 'Data Structures Midterm', section: 'C++', difficulty: 'Hard', status: 'Draft' }, 
@@ -36,6 +42,18 @@ const TeacherDashboard = () => {
   });
   // --- End Placeholder Data ---
 
+  // Fetch courses function
+  const fetchCourses = useCallback(async () => {
+    try {
+      const { data } = await API.get("/courses");
+      setCourses(data);
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+    } finally {
+      setCoursesLoading(false);
+    }
+  }, []);
+
   // NOTE: Wrapped in useCallback to satisfy the useEffect dependency rule (React Hook Warning Fix)
   const fetchResults = useCallback(async () => {
     try {
@@ -50,9 +68,9 @@ const TeacherDashboard = () => {
 
       const { data } = await API.get("/results");
       setResults(data);
-      
+
       const avgScore = data.length > 0 ? (data.reduce((sum, res) => sum + res.score, 0) / data.length / (data[0]?.totalQuestions || 1) * 100).toFixed(0) + '%' : 'N/A';
-      
+
       setPerformanceStats(prev => ({
         ...prev,
         totalSubmissions: data.length,
@@ -67,7 +85,8 @@ const TeacherDashboard = () => {
 
   useEffect(() => {
     fetchResults();
-  }, [fetchResults]); 
+    fetchCourses();
+  }, [fetchResults, fetchCourses]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -200,16 +219,75 @@ const TeacherDashboard = () => {
         title: courseTitle,
         description: courseDescription,
         lessons,
+        visibility: 'public', // Default to public for new courses
       });
 
       setCourseUploadStatus("Course created successfully!");
       setCourseTitle("");
       setCourseDescription("");
       setLessons([{ title: "", content: "" }]);
+      fetchCourses(); // Refresh courses list
     } catch (error) {
       setCourseUploadStatus("Error: " + (error.response?.data?.message || error.message));
       console.error("Course creation failed:", error);
     }
+  };
+
+  // Course management handlers
+  const handleDeleteCourse = async (courseId) => {
+    if (!window.confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
+
+    try {
+      await API.delete(`/courses/${courseId}`);
+      setCourses(prev => prev.filter(course => course._id !== courseId));
+      alert("Course deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete course:", error);
+      alert("Failed to delete course. Please try again.");
+    }
+  };
+
+  const handleToggleCourseVisibility = (courseId) => {
+    setEditingVisibility(courseId);
+    const course = courses.find(c => c._id === courseId);
+    setTempVisibility({ [courseId]: course.visibility || 'public' });
+  };
+
+  const handleVisibilityChange = (courseId, newVisibility) => {
+    setTempVisibility(prev => ({ ...prev, [courseId]: newVisibility }));
+  };
+
+  const handleSaveVisibility = async (courseId) => {
+    const newVisibility = tempVisibility[courseId];
+    try {
+      await API.patch(`/courses/${courseId}`, { visibility: newVisibility });
+      setCourses(prev => prev.map(course =>
+        course._id === courseId ? { ...course, visibility: newVisibility } : course
+      ));
+      setEditingVisibility(null);
+      setTempVisibility(prev => {
+        const updated = { ...prev };
+        delete updated[courseId];
+        return updated;
+      });
+      alert("Course visibility updated successfully!");
+    } catch (error) {
+      console.error("Failed to update course visibility:", error);
+      alert("Failed to update course visibility. Please try again.");
+    }
+  };
+
+  const handleCancelVisibility = (courseId) => {
+    setEditingVisibility(null);
+    setTempVisibility(prev => {
+      const updated = { ...prev };
+      delete updated[courseId];
+      return updated;
+    });
+  };
+
+  const handleEditCourse = (course) => {
+    alert("Edit course functionality is not implemented yet. Course details: " + JSON.stringify(course, null, 2));
   };
 
   // Helper component for Stat Cards
@@ -411,7 +489,106 @@ const TeacherDashboard = () => {
         {/* Divider */}
         <hr className="divider" />
 
-        {/* 5. Test Results Section */}
+        {/* 5. Manage Courses Section */}
+        <h2 className="results-title">
+          <FileText className="icon-left" size={24} /> Manage Uploaded Courses
+        </h2>
+
+        <div className="courses-table-container">
+          {coursesLoading ? (
+            <div className="loading-container">
+              <Loader2 size={24} className="animate-spin text-indigo-600" />
+              <div className="loading-message">Loading courses...</div>
+            </div>
+          ) : courses.length === 0 ? (
+            <p className="no-results-message">No courses created yet.</p>
+          ) : (
+            <table className="courses-table">
+              <thead>
+                <tr>
+                  <th>Course Title</th>
+                  <th>Description</th>
+                  <th>Lessons</th>
+                  <th>Created</th>
+                  <th>Visibility</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {courses.map((course) => (
+                  <tr key={course._id}>
+                    <td>{course.title}</td>
+                    <td>{course.description || "No description"}</td>
+                    <td>{course.lessons?.length || 0} lessons</td>
+                    <td>{new Date(course.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      {editingVisibility === course._id ? (
+                        <div className="visibility-edit">
+                          <select
+                            value={tempVisibility[course._id] || course.visibility || 'public'}
+                            onChange={(e) => handleVisibilityChange(course._id, e.target.value)}
+                            className="visibility-select"
+                          >
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                          </select>
+                          <button
+                            className="action-btn save-btn"
+                            onClick={() => handleSaveVisibility(course._id)}
+                            title="Save"
+                          >
+                            <Check size={16} />
+                          </button>
+                          <button
+                            className="action-btn cancel-btn"
+                            onClick={() => handleCancelVisibility(course._id)}
+                            title="Cancel"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className={`visibility-badge ${course.visibility || 'public'}`}>
+                          {course.visibility || 'public'}
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button
+                          className="action-btn visibility-btn"
+                          onClick={() => handleToggleCourseVisibility(course._id, course.visibility || 'public')}
+                          title={course.visibility === 'private' ? 'Make Public' : 'Make Private'}
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button
+                          className="action-btn edit-btn"
+                          onClick={() => handleEditCourse(course)}
+                          title="Edit Course"
+                        >
+                          <FileText size={16} />
+                        </button>
+                        <button
+                          className="action-btn delete-btn"
+                          onClick={() => handleDeleteCourse(course._id)}
+                          title="Delete Course"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Divider */}
+        <hr className="divider" />
+
+        {/* 6. Test Results Section */}
         <div className="results-header">
             <h2 className="results-title">
                 <BarChart3 className="icon-left" size={24} /> Student Results & Performance Analytics

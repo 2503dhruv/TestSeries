@@ -3,7 +3,7 @@ import Course from "../models/Course.js";
 // Create a new course
 export const createCourse = async (req, res) => {
   try {
-    const { title, description, lessons } = req.body;
+    const { title, description, lessons, visibility } = req.body;
 
     if (!title || !lessons || lessons.length === 0) {
       return res.status(400).json({ message: "Title and at least one lesson are required." });
@@ -13,6 +13,7 @@ export const createCourse = async (req, res) => {
       title,
       description,
       lessons,
+      visibility: visibility || 'public',
     });
 
     await newCourse.save();
@@ -42,6 +43,35 @@ export const getCourseById = async (req, res) => {
     res.json(course);
   } catch (err) {
     console.error("Error fetching course:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Delete course by ID
+export const deleteCourse = async (req, res) => {
+  try {
+    const course = await Course.findByIdAndDelete(req.params.id);
+    if (!course) return res.status(404).json({ message: "Course not found" });
+    res.json({ message: "Course deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting course:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Update course by ID
+export const updateCourse = async (req, res) => {
+  try {
+    const { visibility } = req.body;
+    const course = await Course.findByIdAndUpdate(
+      req.params.id,
+      { visibility },
+      { new: true }
+    );
+    if (!course) return res.status(404).json({ message: "Course not found" });
+    res.json(course);
+  } catch (err) {
+    console.error("Error updating course:", err);
     res.status(500).json({ message: err.message });
   }
 };

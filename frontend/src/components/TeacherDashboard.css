@@ -458,3 +458,92 @@
 .download-sample-btn:hover {
   background-color: #e5e7eb;
 }
+
+/* --- Courses Table --- */
+.courses-table-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e7ff;
+    margin-bottom: 30px;
+}
+
+.courses-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.courses-table thead {
+    background: #334155;
+    color: white;
+}
+
+.courses-table th,
+.courses-table td {
+    padding: 14px 12px;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.courses-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.visibility-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.visibility-badge.public {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.visibility-badge.private {
+    background: #ffedd5;
+    color: #9a3412;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.visibility-btn {
+    color: #4f46e5;
+}
+
+.visibility-btn:hover {
+    background: #e0e7ff;
+}
+
+.delete-btn {
+    color: #ef4444;
+}
+
+.delete-btn:hover {
+    background: #fee2e2;
+}
+
+.edit-btn {
+    color: #4f46e5;
+}
+
+.edit-btn:hover {
+    background: #e0e7ff;
+}

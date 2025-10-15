@@ -14,6 +14,7 @@ const courseSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
   lessons: [lessonSchema],
+  visibility: { type: String, enum: ['public', 'private'], default: 'public' },
   createdBy: { type: String, default: "Faculty" }, // Optional: to track who created it
   createdAt: { type: Date, default: Date.now },
 });

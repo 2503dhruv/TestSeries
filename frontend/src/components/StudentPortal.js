@@ -91,11 +91,11 @@ const StudentPortal = () => {
       {activeTab === "courses" && (
         <div className="tab-content">
           <h2>Available Courses</h2>
-          {courses.length === 0 ? (
+          {courses.filter(course => course.visibility !== 'private').length === 0 ? (
             <p className="no-courses-message">No courses are currently available.</p>
           ) : (
             <div className="courses-grid">
-              {courses.map((course) => (
+              {courses.filter(course => course.visibility !== 'private').map((course) => (
                 <div key={course._id} className="course-card">
                   <div className="course-card-header">
                     <h3>{course.title}</h3>
