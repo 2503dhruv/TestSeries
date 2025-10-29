@@ -29,6 +29,12 @@ const AdminPanel = () => {
   const [courseSearchTerm, setCourseSearchTerm] = useState("");
   const [selectedCourses, setSelectedCourses] = useState([]);
   const [deletingCourseId, setDeletingCourseId] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [userSearchTerm, setUserSearchTerm] = useState("");
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [deletingUserId, setDeletingUserId] = useState(null);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'student' });
   // Fetch tests
   const fetchTests = async () => {
     setLoading(true);
@@ -87,6 +93,20 @@ const AdminPanel = () => {
 
   useEffect(() => {
     if (nav === "courses" && hasKey) fetchCourses();
+  }, [nav, hasKey]);
+
+  // Fetch users
+  const fetchUsers = async () => {
+    try {
+      const { data } = await API.get("/admin/users");
+      setUsers(data);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (nav === "users" && hasKey) fetchUsers();
   }, [nav, hasKey]);
 
   // Delete a test
@@ -179,6 +199,49 @@ const handleBulkDeleteCourses = async () => {
   }
 };
 
+// Delete a user
+const handleDeleteUser = async (id) => {
+  if (!window.confirm("Are you sure you want to delete this user?")) return;
+  try {
+    setDeletingUserId(id);
+    await API.delete(`/admin/users/${id}`);
+    setUsers((prev) => prev.filter((user) => user._id !== id));
+    setSelectedUsers((prev) => prev.filter(selectedId => selectedId !== id));
+  } catch (err) {
+    setError("Failed to delete user.");
+  } finally {
+    setDeletingUserId(null);
+  }
+};
+
+// Bulk delete selected users
+const handleBulkDeleteUsers = async () => {
+  if (selectedUsers.length === 0) return;
+  if (!window.confirm(`Are you sure you want to delete ${selectedUsers.length} users?`)) return;
+  try {
+    for (const id of selectedUsers) {
+      await API.delete(`/admin/users/${id}`);
+    }
+    setUsers(prev => prev.filter(user => !selectedUsers.includes(user._id)));
+    setSelectedUsers([]);
+  } catch (err) {
+    setError("Failed to delete selected users.");
+  }
+};
+
+// Create a new user
+const handleCreateUser = async (e) => {
+  e.preventDefault();
+  try {
+    await API.post("/admin/users", newUser);
+    setNewUser({ name: '', email: '', password: '', role: 'student' });
+    setShowCreateUserModal(false);
+    fetchUsers(); // Refresh the users list
+  } catch (err) {
+    setError("Failed to create user.");
+  }
+};
+
 
   // View test details
   const viewDetails = async (id) => {
@@ -252,6 +315,11 @@ const handleBulkDeleteCourses = async () => {
     return 0;
   });
 
+  const filteredUsers = users.filter(u =>
+    u.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+    u.email.toLowerCase().includes(userSearchTerm.toLowerCase())
+  );
+
     
   return (
     <div className="new-admin-root">
@@ -298,6 +366,12 @@ const handleBulkDeleteCourses = async () => {
             onClick={() => setNav("results")}
           >
             Results
+          </div>
+          <div
+            className={nav === "users" ? "side-link active" : "side-link"}
+            onClick={() => setNav("users")}
+          >
+            Users
           </div>
         </nav>
       </aside>
@@ -694,6 +768,130 @@ const handleBulkDeleteCourses = async () => {
   )}
         </div>
 
+        ) : nav === "users" ? (
+          <div className="users-view">
+            <h1>User Management</h1>
+            {error && <div className="error-message">{error}</div>}
+            {/* Filters */}
+            <div className="filters-row">
+              <input
+                type="text"
+                placeholder="Search users..."
+                value={userSearchTerm}
+                onChange={e => setUserSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <button className="view-btn" onClick={() => setShowCreateUserModal(true)}>
+                Create User
+              </button>
+            </div>
+            {/* Bulk Delete Button */}
+            {selectedUsers.length > 0 && (
+              <button onClick={handleBulkDeleteUsers} className="delete-btn bulk-delete-btn">
+                Delete Selected ({selectedUsers.length})
+              </button>
+            )}
+            {loading ? (
+              <div className="loading-message">Loading users...</div>
+            ) : filteredUsers.length === 0 ? (
+              <p>No users available.</p>
+            ) : (
+              <table className="test-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedUsers(filteredUsers.map(u => u._id));
+                          } else {
+                            setSelectedUsers([]);
+                          }
+                        }}
+                      />
+                    </th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => (
+                    <tr key={user._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.includes(user._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedUsers([...selectedUsers, user._id]);
+                            } else {
+                              setSelectedUsers(selectedUsers.filter(id => id !== user._id));
+                            }
+                          }}
+                        />
+                      </td>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.role}</td>
+                      <td>
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDeleteUser(user._id)}
+                          disabled={deletingUserId === user._id}
+                        >
+                          {deletingUserId === user._id ? "Deleting..." : "Delete"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {showCreateUserModal && (
+              <div className="modal-overlay" onClick={() => setShowCreateUserModal(false)}>
+                <div className="modal-content" onClick={e => e.stopPropagation()}>
+                  <h2>Create New User</h2>
+                  <form onSubmit={handleCreateUser}>
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={newUser.name}
+                      onChange={e => setNewUser({ ...newUser, name: e.target.value })}
+                      required
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={newUser.email}
+                      onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                      required
+                    />
+                    <input
+                      type="password"
+                      placeholder="Password"
+                      value={newUser.password}
+                      onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                      required
+                    />
+                    <select
+                      value={newUser.role}
+                      onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+                    >
+                      <option value="student">Student</option>
+                      <option value="faculty">Faculty</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    <button type="submit" className="view-btn">Create User</button>
+                    <button type="button" className="close-btn" onClick={() => setShowCreateUserModal(false)}>Cancel</button>
+                  </form>
+                </div>
+              </div>
+            )}
+          </div>
         ) : null}
       </main>
     </div>

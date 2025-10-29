@@ -2,6 +2,7 @@ import { Router } from "express";
 import Test from "../models/Test.js";
 import Result from "../models/Result.js";
 import Course from "../models/Course.js";
+import User from "../models/User.js";
 import adminAuth from "../middleware/adminauth.js";
 
 const router = Router();
@@ -74,5 +75,53 @@ router.delete("/courses/:id", adminAuth, async (req, res) => {
   }
 });
 
+// User management routes
+router.get("/users", adminAuth, async (req, res) => {
+  try {
+    const users = await User.find({}, "-password").sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.post("/users", adminAuth, async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    if (!['student', 'faculty', 'admin'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role. Must be student, faculty, or admin' });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const user = new User({ name, email, password, role });
+    await user.save();
+
+    res.status(201).json({
+      message: `${role} account created successfully`,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
+router.delete("/users/:id", adminAuth, async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
 
 export default router;

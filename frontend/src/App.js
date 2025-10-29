@@ -9,6 +9,8 @@ import PublicLayout from './components/layouts/PublicLayout';
 import AdminLayout from './components/layouts/adminlayout.js';
 import Quizes from './components/Quizes';
 import About from './components/About';
+import Login from './components/Login';
+import Signup from './components/Signup';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -16,9 +18,11 @@ function App() {
     return (
         <Router>
             <Routes>
-                
+
                 <Route element={<PublicLayout />}>
                     <Route path="/" element={<HomeDashboard />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
                     <Route path="/Student" element={<StudentPortal />} />
                     <Route path="/test/:id" element={<TestTaker />} />
                     <Route path="/course/:id" element={<CourseViewer />} />
@@ -27,7 +31,7 @@ function App() {
                     <Route path="/about" element={<About />} />
                 </Route>
 
-                
+
                 <Route element={<AdminLayout />}>
                     <Route path="/admin" element={<AdminPanel />} />
                 </Route>

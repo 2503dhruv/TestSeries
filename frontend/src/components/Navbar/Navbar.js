@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../logo.svg'; // CORRECTED PATH: Trying one more level up to resolve compilation
 import './Navbar.css';
 
 const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check for saved theme preference or default to light mode
@@ -18,6 +20,12 @@ const Navbar = () => {
       setIsDarkMode(false);
       document.documentElement.setAttribute('data-theme', 'light');
     }
+
+    // Check for logged in user
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const toggleTheme = () => {
@@ -25,6 +33,13 @@ const Navbar = () => {
     setIsDarkMode(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme ? 'dark' : 'light');
     localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    navigate('/');
   };
 
   return (
@@ -53,6 +68,21 @@ const Navbar = () => {
             <Link to="/teacher" className="nav-link">Faculty Dashboard</Link>
           </li>
         </ul>
+
+        {user ? (
+          <div className="user-section">
+            <span className="user-name">Welcome, {user.name}</span>
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <div className="auth-links">
+            <Link to="/login" className="auth-link">Login</Link>
+            <Link to="/signup" className="auth-link signup-link">Sign Up</Link>
+          </div>
+        )}
+
         <button
           className="theme-toggle"
           onClick={toggleTheme}
