@@ -883,7 +883,6 @@ const handleCreateUser = async (e) => {
                     >
                       <option value="student">Student</option>
                       <option value="faculty">Faculty</option>
-                      <option value="admin">Admin</option>
                     </select>
                     <button type="submit" className="view-btn">Create User</button>
                     <button type="button" className="close-btn" onClick={() => setShowCreateUserModal(false)}>Cancel</button>

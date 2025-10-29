@@ -29,15 +29,14 @@ const Login = () => {
       const { token, user } = response.data;
 
       // Store token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect based on role
-      if (user.role === 'student') {
-        navigate('/Student');
-      } else if (user.role === 'faculty') {
-        navigate('/teacher');
-      }
+      // Dispatch custom event to notify navbar of login
+      window.dispatchEvent(new Event('userLogin'));
+
+      // Redirect to home page after login
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {

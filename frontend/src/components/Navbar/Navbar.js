@@ -22,10 +22,27 @@ const Navbar = () => {
     }
 
     // Check for logged in user
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    const checkUser = () => {
+      const userData = sessionStorage.getItem('user');
+      if (userData) {
+        setUser(JSON.parse(userData));
+      } else {
+        setUser(null);
+      }
+    };
+
+    checkUser();
+
+    // Listen for login events
+    const handleUserLogin = () => {
+      checkUser();
+    };
+
+    window.addEventListener('userLogin', handleUserLogin);
+
+    return () => {
+      window.removeEventListener('userLogin', handleUserLogin);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -36,8 +53,8 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     setUser(null);
     navigate('/');
   };
@@ -61,12 +78,28 @@ const Navbar = () => {
           <li>
               <Link to="/" className="nav-link">Home</Link>
           </li>
-          <li>
-            <Link to="/quizes" className="nav-link">Learning Resources</Link>
-          </li>
-          <li>
-            <Link to="/teacher" className="nav-link">Faculty Dashboard</Link>
-          </li>
+          {user && user.role === 'student' && (
+            <li>
+              <Link to="/Student" className="nav-link">Student Portal</Link>
+            </li>
+          )}
+          {user && user.role === 'faculty' && (
+            <li>
+              <Link to="/teacher" className="nav-link">Faculty Dashboard</Link>
+            </li>
+          )}
+          {user && user.role === 'admin' && (
+            <li>
+              <Link to="/admin" className="nav-link">Admin Portal</Link>
+            </li>
+          )}
+          {!user && (
+            <>
+              <li>
+                <Link to="/quizes" className="nav-link">Learning Resources</Link>
+              </li>
+            </>
+          )}
         </ul>
 
         {user ? (

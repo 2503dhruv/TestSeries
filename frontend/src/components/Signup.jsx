@@ -43,11 +43,14 @@ const Signup = () => {
       const { token, user } = response.data;
 
       // Store token and user info
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('user', JSON.stringify(user));
 
-      // Redirect to student portal
-      navigate('/Student');
+      // Dispatch custom event to notify navbar of signup
+      window.dispatchEvent(new Event('userLogin'));
+
+      // Redirect to home page after signup
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed');
     } finally {
