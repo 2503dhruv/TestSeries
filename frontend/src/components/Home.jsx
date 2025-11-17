@@ -32,7 +32,7 @@ export default function Home() {
           <p>
             The unified platform for streamlined academic automation, intelligent assessment, and efficient learning management.
           </p>
-          <Link to="/student">
+          <Link to="/">
             <button className="cta-btn">Begin Your Assessment Journey</button>
           </Link>
         </div>
