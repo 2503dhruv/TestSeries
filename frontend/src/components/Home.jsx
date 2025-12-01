@@ -1,11 +1,13 @@
-import React from "react";
-import { Users, Laptop, Mail, GraduationCap, FileText, BarChart3, Clock, CheckCircle, Shield, Code } from "lucide-react"; 
+import React, { useState } from "react";
+import { Users, Laptop, Mail, GraduationCap, FileText, BarChart3, Clock, CheckCircle, Shield, Code } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../components/Footer/Footer";
-import "./Home.css"; 
+import Login from "./Login";
+import "./Home.css";
 
 export default function Home() {
   const navigate = useNavigate();
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   const featureList = [
     { icon: FileText, title: "Assignment Management", description: "Faculty can create, distribute, and evaluate assignments efficiently in a structured digital workflow." },
@@ -13,7 +15,7 @@ export default function Home() {
     { icon: BarChart3, title: "Performance Tracking", description: "Personalized dashboards show assignment submissions, test scores, and learning progress." },
     { icon: Laptop, title: "Integrated Learning", description: "Students gain access to centralized digital learning resources like notes, presentations, and recorded lectures." }
   ];
-  
+
   const complianceList = [
       { icon: Shield, title: "FERPA/GDPR Compliance" },
       { icon: CheckCircle, title: "Secure Data Encryption" },
@@ -115,6 +117,16 @@ export default function Home() {
       </section>
 
       <Footer />
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <>
+          <div className="blur-overlay" onClick={() => setShowLoginModal(false)}></div>
+          <div className="login-modal">
+            <Login onClose={() => setShowLoginModal(false)} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ const Login = () => {
     email: '',
     password: ''
   });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -19,6 +20,23 @@ const Login = () => {
     });
   };
 
+  // ------- PURE JAVASCRIPT SHOW/HIDE PASSWORD ----------
+  const togglePassword = () => {
+    const pwd = document.getElementById("password");
+    const icon = document.getElementById("toggleIcon");
+
+    if (pwd.type === "password") {
+      pwd.type = "text";
+      icon.classList.remove("fa-eye");
+      icon.classList.add("fa-eye-slash");
+    } else {
+      pwd.type = "password";
+      icon.classList.remove("fa-eye-slash");
+      icon.classList.add("fa-eye");
+    }
+  };
+  // -----------------------------------------------------
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -28,14 +46,10 @@ const Login = () => {
       const response = await API.post('/auth/login', formData);
       const { token, user } = response.data;
 
-      // Store token and user info
       sessionStorage.setItem('token', token);
       sessionStorage.setItem('user', JSON.stringify(user));
 
-      // Dispatch custom event to notify navbar of login
       window.dispatchEvent(new Event('userLogin'));
-
-      // Redirect to home page after login
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -48,12 +62,14 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <h2>Login</h2>
+
         <form onSubmit={handleSubmit}>
+
+          {/* Email */}
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label>Email</label>
             <input
               type="email"
-              id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
@@ -61,16 +77,26 @@ const Login = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+            <label>Password</label>
+
+            <div className="password-wrapper">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+
+              <i
+                id="toggleIcon"
+                className="fa fa-eye toggle-password"
+                onClick={togglePassword}
+              ></i>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
