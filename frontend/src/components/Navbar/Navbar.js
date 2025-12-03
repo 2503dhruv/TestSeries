@@ -8,6 +8,7 @@ const Navbar = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -89,15 +90,19 @@ const Navbar = () => {
         ) : (
           <div className="auth-links">
             {location.pathname === '/' ? (
-              <button
-                className="auth-link"
-                onClick={() => setShowLoginModal(true)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-              >
-                Login
-              </button>
+              <>
+                <button
+                  className="auth-link"
+                  onClick={() => setShowLoginModal(true)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  Login
+                </button>
+              </>
             ) : (
-              <Link to="/login" className="auth-link">Login</Link>
+              <>
+                <Link to="/login" className="auth-link">Login</Link>
+              </>
             )}
           </div>
         )}

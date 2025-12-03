@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./AdminPortal.css";
 import API from "../api";
-import { FileText } from "lucide-react";
+import { FileText, UserPlus, Trash2, Edit, Calendar, Eye, BookOpen } from "lucide-react";
 
 const AdminPanel = () => {
   const [tests, setTests] = useState([]);
@@ -35,6 +35,8 @@ const AdminPanel = () => {
   const [deletingUserId, setDeletingUserId] = useState(null);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'student' });
+  const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [editingUser, setEditingUser] = useState({ _id: '', name: '', email: '', role: 'student' });
   // Fetch tests
   const fetchTests = async () => {
     setLoading(true);
@@ -240,6 +242,34 @@ const handleCreateUser = async (e) => {
   } catch (err) {
     setError("Failed to create user.");
   }
+};
+
+// Update an existing user
+const handleUpdateUser = async (e) => {
+  e.preventDefault();
+  try {
+    await API.put(`/admin/users/${editingUser._id}`, {
+      name: editingUser.name,
+      email: editingUser.email,
+      role: editingUser.role
+    });
+    setEditingUser({ _id: '', name: '', email: '', role: 'student' });
+    setShowEditUserModal(false);
+    fetchUsers(); // Refresh the users list
+  } catch (err) {
+    setError("Failed to update user.");
+  }
+};
+
+// Open edit modal with user data
+const openEditModal = (user) => {
+  setEditingUser({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role
+  });
+  setShowEditUserModal(true);
 };
 
 
@@ -607,76 +637,72 @@ const handleCreateUser = async (e) => {
             ) : filteredCourses.length === 0 ? (
               <p>No courses available.</p>
             ) : (
-              <table className="test-table">
-                <thead>
-                  <tr>
-                    <th>
+              <div className="courses-grid">
+                {filteredCourses.map((course) => (
+                  <div key={course._id} className="course-card">
+                    <div className="card-header">
                       <input
                         type="checkbox"
-                        checked={selectedCourses.length === filteredCourses.length && filteredCourses.length > 0}
+                        checked={selectedCourses.includes(course._id)}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setSelectedCourses(filteredCourses.map(c => c._id));
+                            setSelectedCourses([...selectedCourses, course._id]);
                           } else {
-                            setSelectedCourses([]);
+                            setSelectedCourses(selectedCourses.filter(id => id !== course._id));
                           }
                         }}
+                        className="card-checkbox"
                       />
-                    </th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredCourses.map((course) => (
-                    <tr key={course._id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedCourses.includes(course._id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedCourses([...selectedCourses, course._id]);
-                            } else {
-                              setSelectedCourses(selectedCourses.filter(id => id !== course._id));
-                            }
-                          }}
-                        />
-                      </td>
-                      <td>{course.title}</td>
-                      <td>{course.description || "-"}</td>
-                      <td>
-                        <button className="view-btn" onClick={() => viewCourseDetails(course._id)}>
-                          View Details
-                        </button>
-                        <button
-                          className="delete-btn"
-                          onClick={() => handleDeleteCourse(course._id)}
-                          disabled={deletingCourseId === course._id}
-                        >
-                          {deletingCourseId === course._id ? "Deleting..." : "Delete"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      <BookOpen size={20} className="card-icon" />
+                    </div>
+                    <div className="card-content">
+                      <h3 className="card-title">{course.title}</h3>
+                      <p className="card-description">
+                        {course.description ? course.description.substring(0, 100) + (course.description.length > 100 ? "..." : "") : "No description available."}
+                      </p>
+                    </div>
+                    <div className="card-actions">
+                      <button className="view-btn" onClick={() => viewCourseDetails(course._id)}>
+                        <Eye size={16} /> View Details
+                      </button>
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDeleteCourse(course._id)}
+                        disabled={deletingCourseId === course._id}
+                      >
+                        <Trash2 size={16} />
+                        {deletingCourseId === course._id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
             {viewingCourse && (
               <div className="modal-overlay" onClick={closeModal}>
-                <div className="modal-content" onClick={e => e.stopPropagation()}>
-                  <h2>{viewingCourse.title}</h2>
-                  <p><strong>Description:</strong> {viewingCourse.description || "-"}</p>
-                  <h3>Lessons:</h3>
-                  <ol>
-                    {viewingCourse.lessons?.map((lesson, idx) => (
-                      <li key={idx}>
-                        <p>{lesson.title}</p>
-                        <p>{lesson.content}</p>
-                      </li>
-                    ))}
-                  </ol>
+                <div className="modal-content course-modal" onClick={e => e.stopPropagation()}>
+                  <h2><BookOpen size={24} style={{ marginRight: '10px' }} />{viewingCourse.title}</h2>
+                  <div className="course-description">
+                    <strong>Description:</strong> {viewingCourse.description || "No description available."}
+                  </div>
+                  <h3>Lessons ({viewingCourse.lessons?.length || 0})</h3>
+                  {viewingCourse.lessons && viewingCourse.lessons.length > 0 ? (
+                    <div className="lessons-list">
+                      {viewingCourse.lessons.map((lesson, idx) => (
+                        <div key={idx} className="lesson-item">
+                          <div className="lesson-header">
+                            <span className="lesson-number">{idx + 1}.</span>
+                            <h4 className="lesson-title">{lesson.title}</h4>
+                          </div>
+                          <div className="lesson-content">
+                            {lesson.content}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No lessons available for this course.</p>
+                  )}
                   <button className="close-btn" onClick={closeModal}>Close</button>
                 </div>
               </div>
@@ -781,14 +807,14 @@ const handleCreateUser = async (e) => {
                 onChange={e => setUserSearchTerm(e.target.value)}
                 className="search-input"
               />
-              <button className="view-btn" onClick={() => setShowCreateUserModal(true)}>
-                Create User
+              <button className="view-btn create-user-btn" onClick={() => setShowCreateUserModal(true)}>
+                <UserPlus size={16} /> Create User
               </button>
             </div>
             {/* Bulk Delete Button */}
             {selectedUsers.length > 0 && (
               <button onClick={handleBulkDeleteUsers} className="delete-btn bulk-delete-btn">
-                Delete Selected ({selectedUsers.length})
+                <Trash2 size={16} /> Delete Selected ({selectedUsers.length})
               </button>
             )}
             {loading ? (
@@ -796,7 +822,7 @@ const handleCreateUser = async (e) => {
             ) : filteredUsers.length === 0 ? (
               <p>No users available.</p>
             ) : (
-              <table className="test-table">
+              <table className="test-table users-table">
                 <thead>
                   <tr>
                     <th>
@@ -815,6 +841,7 @@ const handleCreateUser = async (e) => {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th>Created At</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -836,13 +863,30 @@ const handleCreateUser = async (e) => {
                       </td>
                       <td>{user.name}</td>
                       <td>{user.email}</td>
-                      <td>{user.role}</td>
                       <td>
+                        <span className={`role-badge ${user.role}`}>
+                          {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                        </span>
+                      </td>
+                      <td>
+                        <Calendar size={14} style={{ marginRight: '5px' }} />
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                      <td>
+                        <button
+                          className="view-btn"
+                          onClick={() => openEditModal(user)}
+                          style={{ marginRight: '5px' }}
+                        >
+                          <Edit size={16} />
+                          Edit
+                        </button>
                         <button
                           className="delete-btn"
                           onClick={() => handleDeleteUser(user._id)}
                           disabled={deletingUserId === user._id}
                         >
+                          <Trash2 size={16} />
                           {deletingUserId === user._id ? "Deleting..." : "Delete"}
                         </button>
                       </td>
@@ -853,39 +897,104 @@ const handleCreateUser = async (e) => {
             )}
             {showCreateUserModal && (
               <div className="modal-overlay" onClick={() => setShowCreateUserModal(false)}>
-                <div className="modal-content" onClick={e => e.stopPropagation()}>
-                  <h2>Create New User</h2>
-                  <form onSubmit={handleCreateUser}>
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={newUser.name}
-                      onChange={e => setNewUser({ ...newUser, name: e.target.value })}
-                      required
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={newUser.email}
-                      onChange={e => setNewUser({ ...newUser, email: e.target.value })}
-                      required
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={newUser.password}
-                      onChange={e => setNewUser({ ...newUser, password: e.target.value })}
-                      required
-                    />
-                    <select
-                      value={newUser.role}
-                      onChange={e => setNewUser({ ...newUser, role: e.target.value })}
-                    >
-                      <option value="student">Student</option>
-                      <option value="faculty">Faculty</option>
-                    </select>
-                    <button type="submit" className="view-btn">Create User</button>
-                    <button type="button" className="close-btn" onClick={() => setShowCreateUserModal(false)}>Cancel</button>
+                <div className="modal-content user-modal" onClick={e => e.stopPropagation()}>
+                  <h2><UserPlus size={20} style={{ marginRight: '10px' }} />Create New User</h2>
+                  <form onSubmit={handleCreateUser} className="user-form">
+                    <div className="form-group">
+                      <label>Name</label>
+                      <input
+                        type="text"
+                        placeholder="Enter full name"
+                        value={newUser.name}
+                        onChange={e => setNewUser({ ...newUser, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        placeholder="Enter email address"
+                        value={newUser.email}
+                        onChange={e => setNewUser({ ...newUser, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Password</label>
+                      <input
+                        type="password"
+                        placeholder="Enter password"
+                        value={newUser.password}
+                        onChange={e => setNewUser({ ...newUser, password: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Role</label>
+                      <select
+                        value={newUser.role}
+                        onChange={e => setNewUser({ ...newUser, role: e.target.value })}
+                      >
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                      </select>
+                    </div>
+                    <div className="form-actions">
+                      <button type="submit" className="view-btn">
+                        <UserPlus size={16} /> Create User
+                      </button>
+                      <button type="button" className="close-btn" onClick={() => setShowCreateUserModal(false)}>
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+            {showEditUserModal && (
+              <div className="modal-overlay" onClick={() => setShowEditUserModal(false)}>
+                <div className="modal-content user-modal" onClick={e => e.stopPropagation()}>
+                  <h2><Edit size={20} style={{ marginRight: '10px' }} />Edit User</h2>
+                  <form onSubmit={handleUpdateUser} className="user-form">
+                    <div className="form-group">
+                      <label>Name</label>
+                      <input
+                        type="text"
+                        placeholder="Enter full name"
+                        value={editingUser.name}
+                        onChange={e => setEditingUser({ ...editingUser, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        placeholder="Enter email address"
+                        value={editingUser.email}
+                        onChange={e => setEditingUser({ ...editingUser, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Role</label>
+                      <select
+                        value={editingUser.role}
+                        onChange={e => setEditingUser({ ...editingUser, role: e.target.value })}
+                      >
+                        <option value="student">Student</option>
+                        <option value="faculty">Faculty</option>
+                      </select>
+                    </div>
+                    <div className="form-actions">
+                      <button type="submit" className="view-btn">
+                        <Edit size={16} /> Update User
+                      </button>
+                      <button type="button" className="close-btn" onClick={() => setShowEditUserModal(false)}>
+                        Cancel
+                      </button>
+                    </div>
                   </form>
                 </div>
               </div>

@@ -112,6 +112,38 @@ router.post("/users", adminAuth, async (req, res) => {
   }
 });
 
+router.put("/users/:id", adminAuth, async (req, res) => {
+  try {
+    const { name, email, role } = req.body;
+
+    if (!['student', 'faculty', 'admin'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role. Must be student, faculty, or admin' });
+    }
+
+    // Check if email is already taken by another user
+    const existingUser = await User.findOne({ email, _id: { $ne: req.params.id } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already in use by another user' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, email, role },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({
+      message: "User updated successfully",
+      user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error");
+  }
+});
+
 router.delete("/users/:id", adminAuth, async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
