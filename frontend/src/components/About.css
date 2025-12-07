@@ -1,15 +1,16 @@
 .about-support-root {
-  max-width: 1200px;
-  margin: 40px auto;
+  width: 100%;
+  margin: 0;
+  padding: 0 40px 30px 40px;
   font-family: 'Poppins', Arial, sans-serif;
   color: #222;
   background: #f8f9fa;
-  padding-bottom: 40px;
 }
+
 
 .contact-info-grid {
   display: flex;
-  gap: 36px;
+  gap: 20px;
   justify-content: center;
   align-items: stretch;
   margin: 0 0 32px 0;
@@ -20,17 +21,17 @@
   flex: 1 1 0;
   background: #fff;
   box-shadow: 0 3px 18px rgba(107,151,54,0.09);
-  border-radius: 16px;
-  padding: 36px 32px 34px 32px;
+  border-radius: 20px;
+  padding: 20px 10px 10px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .contact-card .contact-icon {
-  color: #8b5cf6;
+  color: #1aa02a;
   font-size: 50px;
   margin-bottom: 26px;
-  width: 52px; height: 52px;
+  width: 40px; height: 52px;
 }
 
 .contact-card h3 {
@@ -46,11 +47,12 @@
 
 .about-mapbox {
   max-width: 100%;
-  border: 3px solid #8b5cf6;
+  border: 4px solid #76b331;   
   border-radius: 8px;
   overflow: hidden;
-  margin: 0 auto 45px auto;
+  margin: 0;                    
 }
+
 
 .about-support-row {
   display: flex;
@@ -60,18 +62,25 @@
   box-shadow: 0 2px 12px rgba(70,70,90,0.07);
 }
 
-.about-content {
+/* .about-content {
   flex: 1 1 0;
   background: #fff;
   padding: 40px 36px 32px 38px;
   font-size: 1.12em;
+} */
+.about-content {
+  background: #ffffff;
+  padding: 65px 55px;
+  border-radius: 26px;
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.07);
 }
 
-.about-content h2 {
-  margin: 0 0 12px;
-  font-size: 2.1rem;
-  font-weight: bold;
+.about-form h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 26px;
 }
+
 
 .about-content h4 {
   letter-spacing: -0.02em;
@@ -87,15 +96,16 @@
 
 .support-form.about-form {
   flex: 1 1 0;
-  background: #232a32;
-  padding: 40px 36px 30px 36px;
+  background: #1f2630;                 
+  padding: 60px 60px 50px 60px;        
   display: flex;
   flex-direction: column;
   color: #fff;
   font-size: 1rem;
-  border-top-right-radius: 18px;
-  border-bottom-right-radius: 18px;
+  border-radius: 26px;                 
+  box-shadow: 0 8px 35px rgba(0, 0, 0, 0.17);  
 }
+
 
 .about-form h2 {
   font-size: 1.3rem;
@@ -128,22 +138,28 @@
 
 .about-form input:focus,
 .about-form textarea:focus {
-  box-shadow: 0 0 0 2px #8b5cf6;
+  border: 1px solid #7d5cf6;
+  box-shadow: 0 0 0 3px rgba(125, 92, 246, 0.3);
 }
+
 
 /* Button */
 .about-submit-btn {
-  margin-top: 6px;
-  padding: 13px 0;
-  background: #8b5cf6;
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  font-size: 18px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.18s;
+  margin-top: 20px;
+  padding: 15px 0;
+  background: linear-gradient(90deg,#8b5cf6,#6a4ae0);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: .5px;
+  transition: all .25s ease;
 }
+
+.about-submit-btn:hover {
+  background: linear-gradient(90deg,#6a4ae0,#8b5cf6);
+  transform: translateY(-2px);
+}
+
 
 .about-submit-btn:hover {
   background: #76b331;

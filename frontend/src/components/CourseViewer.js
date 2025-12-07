@@ -3,6 +3,10 @@ import { useParams, Link } from "react-router-dom";
 import API from "../api";
 import "./CourseViewer.css";
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+
 const CourseViewer = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
@@ -17,92 +21,104 @@ const CourseViewer = () => {
         setCourse(data);
       } catch (err) {
         setError("Failed to load course details.");
-        console.error("Error fetching course:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchCourse();
   }, [id]);
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="course-viewer-loading">
+      <div className="loader-page">
         <div className="loading-spinner"></div>
-        <p>Loading course...</p>
+        <p>Loading course…</p>
       </div>
     );
-  }
 
-  if (error || !course) {
+  if (error || !course)
     return (
       <div className="course-viewer-error">
         <h2>Error</h2>
-        <p>{error || "Course not found."}</p>
-        <Link to="/student-portal" className="back-btn">
-          Back to Student Portal
+        <p>{error || "Course not found"}</p>
+        <Link to="/student" className="back-nav">
+          Back
         </Link>
       </div>
     );
-  }
 
   const lesson = course.lessons[currentLesson];
+  const progress = ((currentLesson + 1) / course.lessons.length) * 100;
 
   return (
-    <div className="course-viewer">
-      <div className="course-header">
+    <div className="course-viewer-new">
+      {/* HEADER */}
+      <div className="course-hero">
         <h1>{course.title}</h1>
-        <p className="course-description">{course.description}</p>
-        <Link to="/student" className="back-btn">
+        <p>{course.description}</p>
+
+        <div className="course-progress">
+          <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+        </div>
+
+        <Link to="/student" className="back-nav">
           ← Back to Courses
         </Link>
       </div>
 
-      <div className="course-content">
-        <div className="lesson-sidebar">
+      {/* MAIN LAYOUT */}
+      <div className="content-layout">
+        {/* SIDEBAR */}
+        <aside className="lesson-sidebar-new">
           <h3>Lessons</h3>
-          <div className="lesson-list">
-            {course.lessons.map((lesson, index) => (
-              <button
-                key={index}
-                className={`lesson-item ${currentLesson === index ? "active" : ""}`}
-                onClick={() => setCurrentLesson(index)}
+          <div className="lesson-scroll">
+            {course.lessons.map((l, i) => (
+              <div
+                key={i}
+                className={`lesson-step ${i === currentLesson ? "active" : ""}`}
+                onClick={() => setCurrentLesson(i)}
               >
-                <span className="lesson-number">{index + 1}</span>
-                <span className="lesson-title">{lesson.title}</span>
-              </button>
+                <span className="step-index">{i + 1}</span>
+                <p className="step-title">{l.title}</p>
+              </div>
             ))}
           </div>
-        </div>
+        </aside>
 
-        <div className="lesson-content">
-          <div className="lesson-header">
-            <h2>{lesson.title}</h2>
+        {/* LESSON PANEL */}
+        <section className="lesson-panel">
+          <h2>{lesson.title}</h2>
+
+          <div className="lesson-body-new">
+            <ReactMarkdown
+              children={lesson.content}
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+            />
           </div>
-          <div className="lesson-body">
-            <p>{lesson.content}</p>
-          </div>
-          <div className="lesson-navigation">
+
+          <div className="lesson-nav-buttons">
             <button
-              className="nav-btn prev-btn"
               disabled={currentLesson === 0}
               onClick={() => setCurrentLesson(currentLesson - 1)}
+              className="prev-btn"
             >
-              ← Previous
+              Previous
             </button>
-            <span className="lesson-counter">
-              {currentLesson + 1} of {course.lessons.length}
+
+            <span>
+              {currentLesson + 1} / {course.lessons.length}
             </span>
+
             <button
-              className="nav-btn next-btn"
               disabled={currentLesson === course.lessons.length - 1}
               onClick={() => setCurrentLesson(currentLesson + 1)}
+              className="next-btn"
             >
-              Next →
+              Next
             </button>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
